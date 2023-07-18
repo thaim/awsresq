@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	version = "main"
-	region string
-	service string
+	version  = "main"
+	region   string
+	service  string
 	resource string
 )
 
@@ -24,18 +24,18 @@ func main() {
 		Usage: "search resources on AWS",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name: "region",
-				Usage: "region name",
+				Name:        "region",
+				Usage:       "region name",
 				Destination: &region,
 			},
 			&cli.StringFlag{
-				Name: "service",
-				Usage: "service name",
+				Name:        "service",
+				Usage:       "service name",
 				Destination: &service,
 			},
 			&cli.StringFlag{
-				Name: "resource",
-				Usage: "resource name",
+				Name:        "resource",
+				Usage:       "resource name",
 				Destination: &resource,
 			},
 		},
@@ -46,13 +46,15 @@ func main() {
 				fmt.Fprintf(os.Stderr, "initialized failed:%v\n", err)
 				os.Exit(1)
 			}
-			if res, err := client.Search(service, resource, query); err != nil {
-				fmt.Fprintf(os.Stderr, res)
+			if res, err := client.Search(service, resource, query); err == nil {
+				for _, r := range res {
+					fmt.Fprintf(os.Stderr, r)
+				}
 			}
 			return err
 		},
 		HideHelpCommand: true,
-		Version: getVersion(),
+		Version:         getVersion(),
 	}
 
 	err := app.Run(os.Args)
@@ -75,4 +77,3 @@ func getVersion() string {
 
 	return i.Main.Version
 }
-
