@@ -16,6 +16,10 @@ type AwsresqClient struct {
 	awsCfg aws.Config
 }
 
+type ResultList struct {
+	Results []interface{} `json:"results"`
+}
+
 func NewAwsresqClient() (*AwsresqClient, error) {
 	client := &AwsresqClient{}
 	cfg, err := config.LoadDefaultConfig(context.TODO())
@@ -28,9 +32,8 @@ func NewAwsresqClient() (*AwsresqClient, error) {
 	return client, nil
 }
 
-func (c *AwsresqClient) Search(service, resource, query string) ([]string, error) {
-	var resultList []string
-	var result []byte
+func (c *AwsresqClient) Search(service, resource, query string) (string, error) {
+	resultList := ResultList{}
 
 	switch service {
 	case "ecs":
@@ -39,7 +42,7 @@ func (c *AwsresqClient) Search(service, resource, query string) ([]string, error
 		case "task-definition":
 			listOutput, err := api.ListTaskDefinitions(context.Background(), nil)
 			if err != nil {
-				return resultList, err
+				return "", err
 			}
 			for _, arn := range listOutput.TaskDefinitionArns {
 				input := &ecs.DescribeTaskDefinitionInput{
@@ -47,25 +50,25 @@ func (c *AwsresqClient) Search(service, resource, query string) ([]string, error
 				}
 				output, err := api.DescribeTaskDefinition(context.Background(), input)
 				if err != nil {
-					return resultList, err
+					return "", err
 				}
 
-				result, err = json.Marshal(output)
-				if err != nil {
-					return resultList, err
-				}
-
-				resultList = append(resultList, string(result))
+				var result interface{} = output
+				resultList.Results = append(resultList.Results, result)
 			}
 		default:
 			log.Error().Msgf("resource '%s' not supported in service '%s'", resource, service)
-			return resultList, fmt.Errorf("resource '%s' not supported in service '%s'", resource, service)
+			return "", fmt.Errorf("resource '%s' not supported in service '%s'", resource, service)
 		}
 	default:
 		log.Error().Msgf("service not supported: %s", service)
-		return resultList, fmt.Errorf("service not supported: %s", service)
+		return "", fmt.Errorf("service not supported: %s", service)
 	}
 
+	res, err := json.MarshalIndent(resultList, "", "  ")
+	if err != nil {
+		return "", err
+	}
 
-	return resultList, nil
+	return string(res), nil
 }

@@ -47,9 +47,7 @@ func main() {
 				os.Exit(1)
 			}
 			if res, err := client.Search(service, resource, query); err == nil {
-				for _, r := range res {
-					fmt.Fprintf(os.Stderr, r)
-				}
+				fmt.Fprintf(os.Stderr, res)
 			}
 			return err
 		},
