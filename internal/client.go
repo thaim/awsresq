@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	"github.com/itchyny/gojq"
 	"github.com/rs/zerolog/log"
 )
 
@@ -35,6 +36,11 @@ func NewAwsresqClient() (*AwsresqClient, error) {
 func (c *AwsresqClient) Search(service, resource, query string) (string, error) {
 	resultList := ResultList{}
 
+	goQuery, err := gojq.Parse(query)
+	if err != nil {
+		return "", err
+	}
+
 	switch service {
 	case "ecs":
 		api := ecs.NewFromConfig(c.awsCfg)
@@ -54,7 +60,18 @@ func (c *AwsresqClient) Search(service, resource, query string) (string, error) 
 				}
 
 				var result interface{} = output
-				resultList.Results = append(resultList.Results, result)
+				iter := goQuery.Run(result)
+				for {
+					v, ok := iter.Next()
+					if ! ok {
+						break
+					}
+					if err, ok := v.(error); ok {
+						log.Error().Err(err).Msg("failed to apply query")
+						return "", err
+					}
+					resultList.Results = append(resultList.Results, v)
+				}
 			}
 		default:
 			log.Error().Msgf("resource '%s' not supported in service '%s'", resource, service)
