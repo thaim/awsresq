@@ -18,6 +18,9 @@ type AwsresqClient struct {
 }
 
 type ResultList struct {
+	Service string `json:service`
+	Resource string `json:resource`
+	Query string `json:query`
 	Results []interface{} `json:"results"`
 }
 
@@ -34,7 +37,11 @@ func NewAwsresqClient() (*AwsresqClient, error) {
 }
 
 func (c *AwsresqClient) Search(service, resource, query string) (string, error) {
-	resultList := ResultList{}
+	resultList := ResultList{
+		Service: service,
+		Resource: resource,
+		Query: query,
+	}
 
 	goQuery, err := gojq.Parse(query)
 	if err != nil {
