@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/itchyny/gojq"
@@ -83,6 +84,21 @@ func (c *AwsresqClient) Search(service, resource, query string) (string, error) 
 					}
 					resultList.Results = append(resultList.Results, v)
 				}
+			}
+		default:
+			log.Error().Msgf("resource '%s' not supported in service '%s'", resource, service)
+			return "", fmt.Errorf("resource '%s' not supported in service '%s'", resource, service)
+		}
+	case "logs":
+		api := cloudwatchlogs.NewFromConfig(c.awsCfg)
+		switch resource {
+		case "log-group":
+			listOutput, err := api.DescribeLogGroups(context.Background(), nil)
+			if err != nil {
+				return "", err
+			}
+			for _, lg := range listOutput.LogGroups {
+				resultList.Results = append(resultList.Results, lg)
 			}
 		default:
 			log.Error().Msgf("resource '%s' not supported in service '%s'", resource, service)
