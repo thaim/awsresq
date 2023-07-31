@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/itchyny/gojq"
 	"github.com/rs/zerolog/log"
 )
@@ -60,6 +61,9 @@ func (c *AwsresqClient) Search(service, resource, query string) (string, error) 
 			for _, arn := range listOutput.TaskDefinitionArns {
 				input := &ecs.DescribeTaskDefinitionInput{
 					TaskDefinition: aws.String(arn),
+					Include: []types.TaskDefinitionField{
+						types.TaskDefinitionFieldTags,
+					},
 				}
 				output, err := api.DescribeTaskDefinition(context.Background(), input)
 				if err != nil {
