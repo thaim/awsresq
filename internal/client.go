@@ -8,9 +8,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go-v2/service/ecs"
-	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/rs/zerolog/log"
 )
 
@@ -38,53 +35,22 @@ func NewAwsresqClient() (*AwsresqClient, error) {
 }
 
 func (c *AwsresqClient) Search(service, resource, query string) (string, error) {
-	resultList := ResultList{
-		Service: service,
-		Resource: resource,
-		Query: query,
-	}
+	var resultList *ResultList
 
 	switch service {
 	case "ecs":
-		api := ecs.NewFromConfig(c.awsCfg)
-		switch resource {
-		case "task-definition":
-			listOutput, err := api.ListTaskDefinitions(context.Background(), nil)
-			if err != nil {
-				return "", err
-			}
-			for _, arn := range listOutput.TaskDefinitionArns {
-				input := &ecs.DescribeTaskDefinitionInput{
-					TaskDefinition: aws.String(arn),
-					Include: []types.TaskDefinitionField{
-						types.TaskDefinitionFieldTags,
-					},
-				}
-				output, err := api.DescribeTaskDefinition(context.Background(), input)
-				if err != nil {
-					return "", err
-				}
-
-				resultList.Results = append(resultList.Results, output)
-			}
-		default:
-			log.Error().Msgf("resource '%s' not supported in service '%s'", resource, service)
-			return "", fmt.Errorf("resource '%s' not supported in service '%s'", resource, service)
+		api := NewAwsEcsAPI(c.awsCfg)
+		var err error
+		resultList, err = api.Query(resource)
+		if err != nil {
+			return "", err
 		}
 	case "logs":
-		api := cloudwatchlogs.NewFromConfig(c.awsCfg)
-		switch resource {
-		case "log-group":
-			listOutput, err := api.DescribeLogGroups(context.Background(), nil)
-			if err != nil {
-				return "", err
-			}
-			for _, lg := range listOutput.LogGroups {
-				resultList.Results = append(resultList.Results, lg)
-			}
-		default:
-			log.Error().Msgf("resource '%s' not supported in service '%s'", resource, service)
-			return "", fmt.Errorf("resource '%s' not supported in service '%s'", resource, service)
+		api := NewAwsLogsAPI(c.awsCfg)
+		var err error
+		resultList, err = api.Query(resource)
+		if err != nil {
+			return "", err
 		}
 	default:
 		log.Error().Msgf("service not supported: %s", service)
