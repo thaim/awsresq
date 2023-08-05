@@ -40,13 +40,12 @@ func main() {
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			query := ctx.Args().Get(0)
 			client, err := awsresq.NewAwsresqClient()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "initialized failed:%v\n", err)
 				os.Exit(1)
 			}
-			if res, err := client.Search(service, resource, query); err == nil {
+			if res, err := client.Search(service, resource); err == nil {
 				fmt.Fprintf(os.Stdout, res)
 			}
 			return err

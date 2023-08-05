@@ -18,7 +18,6 @@ type AwsresqClient struct {
 type ResultList struct {
 	Service string `json:service`
 	Resource string `json:resource`
-	Query string `json:query`
 	Results []interface{} `json:"results"`
 }
 
@@ -34,7 +33,7 @@ func NewAwsresqClient() (*AwsresqClient, error) {
 	return client, nil
 }
 
-func (c *AwsresqClient) Search(service, resource, query string) (string, error) {
+func (c *AwsresqClient) Search(service, resource string) (string, error) {
 	var resultList *ResultList
 
 	switch service {
