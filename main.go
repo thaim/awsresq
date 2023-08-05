@@ -32,6 +32,7 @@ func main() {
 				Name:        "service",
 				Usage:       "service name",
 				Destination: &service,
+				Required:     true,
 			},
 			&cli.StringFlag{
 				Name:        "resource",
