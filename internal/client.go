@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -13,6 +14,7 @@ import (
 
 type AwsresqClient struct {
 	awsCfg aws.Config
+	Region []string
 }
 
 type ResultList struct {
@@ -21,14 +23,17 @@ type ResultList struct {
 	Results []interface{} `json:"results"`
 }
 
-func NewAwsresqClient() (*AwsresqClient, error) {
+func NewAwsresqClient(region string) (*AwsresqClient, error) {
 	client := &AwsresqClient{}
+
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "configuration error")
 		return nil, err
 	}
 	client.awsCfg = cfg
+
+	client.Region = buildRegion(region)
 
 	return client, nil
 }
@@ -62,4 +67,19 @@ func (c *AwsresqClient) Search(service, resource string) (string, error) {
 	}
 
 	return string(res), nil
+}
+
+func buildRegion(region string) []string {
+	if region == "all" {
+		return []string{
+			"us-east-1", "us-east-2", "us-west-1", "us-west-2",
+			"ap-south-1", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "ap-southeast-1", "ap-southeast-2",
+			"ca-central-1",
+			"cn-north-1", "cn-nothwest-1",
+			"eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3",
+			"sa-east-1",
+		}
+	}
+
+	return strings.Split(region, ",")
 }
