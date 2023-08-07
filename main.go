@@ -41,7 +41,7 @@ func main() {
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			client, err := awsresq.NewAwsresqClient()
+			client, err := awsresq.NewAwsresqClient(region)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "initialized failed:%v\n", err)
 				os.Exit(1)

@@ -43,7 +43,7 @@ func (c *AwsresqClient) Search(service, resource string) (string, error) {
 
 	switch service {
 	case "ecs":
-		api := NewAwsEcsAPI(c.awsCfg)
+		api := NewAwsEcsAPI(c.awsCfg, c.Region)
 		var err error
 		resultList, err = api.Query(resource)
 		if err != nil {
@@ -70,13 +70,12 @@ func (c *AwsresqClient) Search(service, resource string) (string, error) {
 }
 
 func buildRegion(region string) []string {
-	if region == "all" {
+	if region == "all" || region == "" {
 		return []string{
 			"us-east-1", "us-east-2", "us-west-1", "us-west-2",
 			"ap-south-1", "ap-northeast-1", "ap-northeast-2", "ap-northeast-3", "ap-southeast-1", "ap-southeast-2",
 			"ca-central-1",
-			"cn-north-1", "cn-nothwest-1",
-			"eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3",
+			"eu-central-1", "eu-west-1", "eu-west-2", "eu-west-3", "eu-north-1",
 			"sa-east-1",
 		}
 	}

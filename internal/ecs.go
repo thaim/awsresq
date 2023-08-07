@@ -12,12 +12,13 @@ import (
 
 type AwsEcsAPI struct {
 	awsCfg aws.Config
-	awsApi *ecs.Client
+	region []string
 }
 
-func NewAwsEcsAPI(c aws.Config) *AwsEcsAPI {
+func NewAwsEcsAPI(c aws.Config, region []string) *AwsEcsAPI {
 	return &AwsEcsAPI{
 		awsCfg: c,
+		region: region,
 	}
 }
 
@@ -28,11 +29,21 @@ func (api *AwsEcsAPI) Query(resource string) (*ResultList, error) {
 	}
 	var err error = nil
 
-	api.awsApi = ecs.NewFromConfig(api.awsCfg)
-
 	switch resource {
 	case "task-definition":
-		resultList, err = api.queryTaskDefinition()
+		ch := make(chan ResultList)
+
+		for _, r := range api.region {
+			go api.queryTaskDefinition(ch, r)
+		}
+
+		for _ = range api.region {
+			result := <-ch
+			if result.Results != nil {
+				resultList.Results = append(resultList.Results, result.Results...)
+			}
+		}
+
 	default:
 		log.Error().Msgf("resource '%s' not supported in ecs service", resource)
 		return nil, fmt.Errorf("resource '%s' not supported in ecs service", resource)
@@ -41,17 +52,20 @@ func (api *AwsEcsAPI) Query(resource string) (*ResultList, error) {
 	return resultList, err
 }
 
-func (api *AwsEcsAPI) queryTaskDefinition() (*ResultList, error) {
-	resultList := &ResultList{
+func (api *AwsEcsAPI) queryTaskDefinition(ch chan ResultList, r string) {
+	resultList := ResultList{
 		Service: "ecs",
 		Resource: "task-definition",
 	}
 
-	awsAPI := ecs.NewFromConfig(api.awsCfg)
+	awsApi := ecs.NewFromConfig(api.awsCfg, func(o *ecs.Options) {
+		o.Region = r
+	})
 
-	listOutput, err := api.awsApi.ListTaskDefinitions(context.Background(), nil)
+	listOutput, err := awsApi.ListTaskDefinitions(context.Background(), nil)
 	if err != nil {
-		return nil, err
+		fmt.Println(err)
+		return
 	}
 	for _, arn := range listOutput.TaskDefinitionArns {
 		input := &ecs.DescribeTaskDefinitionInput{
@@ -60,13 +74,14 @@ func (api *AwsEcsAPI) queryTaskDefinition() (*ResultList, error) {
 				types.TaskDefinitionFieldTags,
 			},
 		}
-		output, err := awsAPI.DescribeTaskDefinition(context.Background(), input)
+		output, err := awsApi.DescribeTaskDefinition(context.Background(), input)
 		if err != nil {
-			return nil, err
+			fmt.Println(err)
+			return
 		}
 
 		resultList.Results = append(resultList.Results, output)
 	}
 
-	return resultList, nil
+	ch <- resultList
 }
