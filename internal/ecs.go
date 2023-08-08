@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
@@ -32,15 +33,21 @@ func (api *AwsEcsAPI) Query(resource string) (*ResultList, error) {
 	switch resource {
 	case "task-definition":
 		ch := make(chan ResultList)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
 
 		for _, r := range api.region {
-			go api.queryTaskDefinition(ch, r)
+			go api.queryTaskDefinition(ctx, ch, r)
 		}
 
 		for _ = range api.region {
-			result := <-ch
-			if result.Results != nil {
-				resultList.Results = append(resultList.Results, result.Results...)
+			select {
+			case result := <-ch:
+				if result.Results != nil {
+					resultList.Results = append(resultList.Results, result.Results...)
+				}
+			case <-ctx.Done():
+				return resultList, ctx.Err()
 			}
 		}
 
@@ -52,7 +59,7 @@ func (api *AwsEcsAPI) Query(resource string) (*ResultList, error) {
 	return resultList, err
 }
 
-func (api *AwsEcsAPI) queryTaskDefinition(ch chan ResultList, r string) {
+func (api *AwsEcsAPI) queryTaskDefinition(ctx context.Context, ch chan ResultList, r string) {
 	resultList := ResultList{
 		Service: "ecs",
 		Resource: "task-definition",
@@ -62,7 +69,7 @@ func (api *AwsEcsAPI) queryTaskDefinition(ch chan ResultList, r string) {
 		o.Region = r
 	})
 
-	listOutput, err := awsApi.ListTaskDefinitions(context.Background(), nil)
+	listOutput, err := awsApi.ListTaskDefinitions(ctx, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -74,7 +81,7 @@ func (api *AwsEcsAPI) queryTaskDefinition(ch chan ResultList, r string) {
 				types.TaskDefinitionFieldTags,
 			},
 		}
-		output, err := awsApi.DescribeTaskDefinition(context.Background(), input)
+		output, err := awsApi.DescribeTaskDefinition(ctx, input)
 		if err != nil {
 			fmt.Println(err)
 			return
