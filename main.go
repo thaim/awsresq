@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"runtime/debug"
 
@@ -46,7 +45,9 @@ func main() {
 				fmt.Fprintf(os.Stderr, "initialized failed:%v\n", err)
 				os.Exit(1)
 			}
-			if res, err := client.Search(service, resource); err == nil {
+
+			res, err := client.Search(service, resource)
+			if err != nil {
 				fmt.Fprintf(os.Stdout, res)
 			}
 			return err
@@ -57,7 +58,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
