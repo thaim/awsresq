@@ -18,8 +18,8 @@ type AwsresqClient struct {
 }
 
 type ResultList struct {
-	Service string `json:service`
-	Resource string `json:resource`
+	Service string `json:"service"`
+	Resource string `json:"resource"`
 	Results []interface{} `json:"results"`
 }
 
