@@ -15,6 +15,7 @@ import (
 type AwsresqClient struct {
 	awsCfg aws.Config
 	Region []string
+	api    AwsAPI
 }
 
 type ResultList struct {
@@ -23,7 +24,12 @@ type ResultList struct {
 	Results []interface{} `json:"results"`
 }
 
-func NewAwsresqClient(region string) (*AwsresqClient, error) {
+type AwsAPI interface {
+	Validate(resource string) bool
+	Query(resource string) (*ResultList, error)
+}
+
+func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
 	client := &AwsresqClient{}
 
 	cfg, err := config.LoadDefaultConfig(context.TODO())
@@ -35,30 +41,28 @@ func NewAwsresqClient(region string) (*AwsresqClient, error) {
 
 	client.Region = buildRegion(region)
 
+	switch service {
+	case "ecs":
+		client.api = NewAwsEcsAPI(client.awsCfg, client.Region)
+	case "logs":
+		client.api = NewAwsLogsAPI(client.awsCfg)
+	default:
+		log.Error().Msgf("service not supported: %s", service)
+		return nil, fmt.Errorf("service not supported: %s", service)
+	}
+
 	return client, nil
+}
+
+func (c *AwsresqClient) Validate(service, resource string) bool {
+	return c.api.Validate(resource)
 }
 
 func (c *AwsresqClient) Search(service, resource string) (string, error) {
 	var resultList *ResultList
-
-	switch service {
-	case "ecs":
-		api := NewAwsEcsAPI(c.awsCfg, c.Region)
-		var err error
-		resultList, err = api.Query(resource)
-		if err != nil {
-			return "", err
-		}
-	case "logs":
-		api := NewAwsLogsAPI(c.awsCfg)
-		var err error
-		resultList, err = api.Query(resource)
-		if err != nil {
-			return "", err
-		}
-	default:
-		log.Error().Msgf("service not supported: %s", service)
-		return "", fmt.Errorf("service not supported: %s", service)
+	resultList, err := c.api.Query(resource)
+	if err != nil {
+		return "", err
 	}
 
 	res, err := json.MarshalIndent(resultList, "", "  ")

@@ -16,14 +16,18 @@ type AwsEcsAPI struct {
 	region []string
 }
 
-func NewAwsEcsAPI(c aws.Config, region []string) *AwsEcsAPI {
-	return &AwsEcsAPI{
+func NewAwsEcsAPI(c aws.Config, region []string) AwsEcsAPI {
+	return AwsEcsAPI{
 		awsCfg: c,
 		region: region,
 	}
 }
 
-func (api *AwsEcsAPI) Query(resource string) (*ResultList, error) {
+func (api AwsEcsAPI) Validate(resource string) bool {
+	return true
+}
+
+func (api AwsEcsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
 		Service: "ecs",
 		Resource: resource,

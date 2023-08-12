@@ -19,7 +19,11 @@ func NewAwsLogsAPI(c aws.Config) *AwsLogsAPI {
 	}
 }
 
-func (api *AwsLogsAPI) Query(resource string) (*ResultList, error) {
+func (api AwsLogsAPI) Validate(resource string) bool {
+	return true
+}
+
+func (api AwsLogsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
 		Service: "logs",
 		Resource: resource,

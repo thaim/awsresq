@@ -40,9 +40,15 @@ func main() {
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			client, err := awsresq.NewAwsresqClient(region)
+			client, err := awsresq.NewAwsresqClient(region, service)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "initialized failed:%v\n", err)
+				os.Exit(1)
+			}
+
+			validate := client.Validate(service, resource)
+			if !validate {
+				fmt.Fprintf(os.Stderr, "resource '%s' not supported in service '%s'\n", resource, service)
 				os.Exit(1)
 			}
 
