@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/aws/aws-sdk-go-v2 v1.20.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.33
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.23.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.23.2
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.29.3
 	github.com/rs/zerolog v1.30.0
 	github.com/urfave/cli/v2 v2.25.7
