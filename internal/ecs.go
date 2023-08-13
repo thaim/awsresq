@@ -24,7 +24,12 @@ func NewAwsEcsAPI(c aws.Config, region []string) AwsEcsAPI {
 }
 
 func (api AwsEcsAPI) Validate(resource string) bool {
-	return true
+	switch resource {
+		case "task-definition":
+		return true
+	}
+
+	return false
 }
 
 func (api AwsEcsAPI) Query(resource string) (*ResultList, error) {

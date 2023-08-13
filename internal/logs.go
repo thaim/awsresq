@@ -20,7 +20,12 @@ func NewAwsLogsAPI(c aws.Config) *AwsLogsAPI {
 }
 
 func (api AwsLogsAPI) Validate(resource string) bool {
-	return true
+	switch resource {
+	case "log-group":
+		return true
+	}
+
+	return false
 }
 
 func (api AwsLogsAPI) Query(resource string) (*ResultList, error) {
