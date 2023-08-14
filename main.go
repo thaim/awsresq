@@ -46,7 +46,7 @@ func main() {
 				os.Exit(1)
 			}
 
-			validate := client.Validate(service, resource)
+			validate := client.Validate(resource)
 			if !validate {
 				fmt.Fprintf(os.Stderr, "resource '%s' not supported in service '%s'\n", resource, service)
 				os.Exit(1)
