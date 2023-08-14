@@ -2,8 +2,54 @@ package internal
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
+
+func TestNewAwsresqClient(t *testing.T) {
+	cases := []struct {
+		name string
+		region string
+		service string
+		wantErr bool
+		expectErr string
+	}{
+		{
+			name: "initialize client with service ecs",
+			service: "ecs",
+			wantErr: false,
+		},
+		{
+			name: "specify undefined service",
+			region: "all",
+			service: "custom",
+			wantErr: true,
+			expectErr: "service not supported: custom",
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			actual, err := NewAwsresqClient(tt.region, tt.service)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error '%s', but got no error", tt.expectErr)
+				} else if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected error '%s', but got '%s'", tt.expectErr, err.Error())
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+
+			if actual == nil {
+				t.Errorf("expected client, but got nil")
+			}
+		})
+	}
+}
 
 func TestBuildRegion(t *testing.T) {
 	cases := []struct {
