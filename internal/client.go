@@ -54,6 +54,7 @@ func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
 	return client, nil
 }
 
+// Validate check if the resource is supported in the service
 func (c *AwsresqClient) Validate(resource string) bool {
 	return c.api.Validate(resource)
 }
