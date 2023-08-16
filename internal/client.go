@@ -10,23 +10,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/rs/zerolog/log"
+
+	svc "github.com/thaim/awsresq/service"
 )
 
 type AwsresqClient struct {
 	awsCfg aws.Config
 	Region []string
-	api    AwsAPI
-}
-
-type ResultList struct {
-	Service string `json:"service"`
-	Resource string `json:"resource"`
-	Results []interface{} `json:"results"`
-}
-
-type AwsAPI interface {
-	Validate(resource string) bool
-	Query(resource string) (*ResultList, error)
+	api    svc.AwsAPI
 }
 
 func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
@@ -43,9 +34,9 @@ func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
 
 	switch service {
 	case "ecs":
-		client.api = NewAwsEcsAPI(client.awsCfg, client.Region)
+		client.api = svc.NewAwsEcsAPI(client.awsCfg, client.Region)
 	case "logs":
-		client.api = NewAwsLogsAPI(client.awsCfg)
+		client.api = svc.NewAwsLogsAPI(client.awsCfg)
 	default:
 		log.Error().Msgf("service not supported: %s", service)
 		return nil, fmt.Errorf("service not supported: %s", service)
@@ -60,7 +51,7 @@ func (c *AwsresqClient) Validate(resource string) bool {
 }
 
 func (c *AwsresqClient) Search(service, resource string) (string, error) {
-	var resultList *ResultList
+	var resultList *svc.ResultList
 	resultList, err := c.api.Query(resource)
 	if err != nil {
 		return "", err
