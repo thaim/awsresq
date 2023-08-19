@@ -11,15 +11,22 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type awsEcsAPI interface {
+	ListTaskDefinitions(ctx context.Context, params *ecs.ListTaskDefinitionsInput, optFns ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error)
+	DescribeTaskDefinition(ctx context.Context, params *ecs.DescribeTaskDefinitionInput, optFns ...func(*ecs.Options)) (*ecs.DescribeTaskDefinitionOutput, error)
+}
+
 type AwsEcsAPI struct {
 	awsCfg aws.Config
 	region []string
+	apiClient map[string]awsEcsAPI
 }
 
 func NewAwsEcsAPI(c aws.Config, region []string) AwsEcsAPI {
 	return AwsEcsAPI{
 		awsCfg: c,
 		region: region,
+		apiClient: make(map[string]awsEcsAPI, len(region)),
 	}
 }
 
@@ -74,11 +81,13 @@ func (api *AwsEcsAPI) queryTaskDefinition(ctx context.Context, ch chan ResultLis
 		Resource: "task-definition",
 	}
 
-	awsApi := ecs.NewFromConfig(api.awsCfg, func(o *ecs.Options) {
-		o.Region = r
-	})
+	if api.apiClient[r] == nil {
+		api.apiClient[r] = ecs.NewFromConfig(api.awsCfg, func(o *ecs.Options) {
+			o.Region = r
+		})
+	}
 
-	listOutput, err := awsApi.ListTaskDefinitions(ctx, nil)
+	listOutput, err := api.apiClient[r].ListTaskDefinitions(ctx, nil)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -90,7 +99,7 @@ func (api *AwsEcsAPI) queryTaskDefinition(ctx context.Context, ch chan ResultLis
 				types.TaskDefinitionFieldTags,
 			},
 		}
-		output, err := awsApi.DescribeTaskDefinition(ctx, input)
+		output, err := api.apiClient[r].DescribeTaskDefinition(ctx, input)
 		if err != nil {
 			fmt.Println(err)
 			return
