@@ -17,7 +17,7 @@ import (
 type AwsresqClient struct {
 	awsCfg aws.Config
 	Region []string
-	api    svc.AwsAPI
+	api    svc.AwsresqAPI
 }
 
 func NewAwsresqClient(region, service string) (*AwsresqClient, error) {

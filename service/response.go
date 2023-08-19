@@ -6,7 +6,7 @@ type ResultList struct {
 	Results []interface{} `json:"results"`
 }
 
-type AwsAPI interface {
+type AwsresqAPI interface {
 	Validate(resource string) bool
 	Query(resource string) (*ResultList, error)
 }
