@@ -53,7 +53,7 @@ func main() {
 			}
 
 			res, err := client.Search(service, resource)
-			if err != nil {
+			if err == nil {
 				fmt.Fprintf(os.Stdout, res)
 			}
 			return err
