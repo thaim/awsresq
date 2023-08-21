@@ -13,3 +13,6 @@ build: ## Build binaries
 test: ## Run test
 	go test -coverprofile=coverage.out -covermode=atomic ./...
 
+.PHONY: mock
+mock:
+	go generate ./...
