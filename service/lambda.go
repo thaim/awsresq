@@ -9,6 +9,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type awsLambdaAPI interface {
+	ListFunctions(ctx context.Context, params *lambda.ListFunctionsInput, optFns ...func(*lambda.Options)) (*lambda.ListFunctionsOutput, error)
+}
+
 type AwsresqLambdaAPI struct {
 	awsCfg aws.Config
 }
