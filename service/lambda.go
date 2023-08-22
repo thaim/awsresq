@@ -9,17 +9,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type AwsLambdaAPI struct {
+type AwsresqLambdaAPI struct {
 	awsCfg aws.Config
 }
 
-func NewAwsLambdaAPI(c aws.Config) *AwsLambdaAPI {
-	return &AwsLambdaAPI{
+func NewAwsresqLambdaAPI(c aws.Config) *AwsresqLambdaAPI {
+	return &AwsresqLambdaAPI{
 		awsCfg: c,
 	}
 }
 
-func (api AwsLambdaAPI) Validate(resource string) bool {
+func (api AwsresqLambdaAPI) Validate(resource string) bool {
 	switch resource {
 	case "function":
 		return true
@@ -28,7 +28,7 @@ func (api AwsLambdaAPI) Validate(resource string) bool {
 	return false
 }
 
-func (api AwsLambdaAPI) Query(resource string) (*ResultList, error) {
+func (api AwsresqLambdaAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
 		Service:  "lambda",
 		Resource: resource,
