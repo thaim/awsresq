@@ -1,3 +1,4 @@
+//go:generate mockgen -source=$GOFILE -package=$GOPACKAGE_mock -destination=../mock/$GOFILE
 package service
 
 import (
@@ -42,15 +43,20 @@ func (api AwsresqLambdaAPI) Query(resource string) (*ResultList, error) {
 		Resource: resource,
 	}
 
-	awsAPI := lambda.NewFromConfig(api.awsCfg)
 	switch resource {
 	case "function":
-		listOutput, err := awsAPI.ListFunctions(context.Background(), nil)
-		if err != nil {
-			return nil, err
-		}
-		for _, f := range listOutput.Functions {
-			resultList.Results = append(resultList.Results, f)
+		for _, r := range api.region {
+			awsAPI := lambda.NewFromConfig(api.awsCfg, func(o *lambda.Options) {
+				o.Region = r
+			})
+
+			listOutput, err := awsAPI.ListFunctions(context.Background(), nil)
+			if err != nil {
+				return nil, err
+			}
+			for _, f := range listOutput.Functions {
+				resultList.Results = append(resultList.Results, f)
+			}
 		}
 	default:
 		log.Error().Msgf("resource '%s' not supported in lambda service", resource)
