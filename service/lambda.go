@@ -46,11 +46,13 @@ func (api AwsresqLambdaAPI) Query(resource string) (*ResultList, error) {
 	switch resource {
 	case "function":
 		for _, r := range api.region {
-			awsAPI := lambda.NewFromConfig(api.awsCfg, func(o *lambda.Options) {
-				o.Region = r
-			})
+			if api.apiClient[r] == nil {
+				api.apiClient[r] = lambda.NewFromConfig(api.awsCfg, func(o *lambda.Options) {
+					o.Region = r
+				})
+			}
 
-			listOutput, err := awsAPI.ListFunctions(context.Background(), nil)
+			listOutput, err := api.apiClient[r].ListFunctions(context.Background(), nil)
 			if err != nil {
 				return nil, err
 			}
