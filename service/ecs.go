@@ -1,3 +1,4 @@
+//go:generate mockgen -source=$GOFILE -package=$GOPACKAGE_mock -destination=../mock/$GOFILE
 package service
 
 import (
@@ -16,21 +17,21 @@ type awsEcsAPI interface {
 	DescribeTaskDefinition(ctx context.Context, params *ecs.DescribeTaskDefinitionInput, optFns ...func(*ecs.Options)) (*ecs.DescribeTaskDefinitionOutput, error)
 }
 
-type AwsEcsAPI struct {
+type AwsresqEcsAPI struct {
 	awsCfg aws.Config
 	region []string
 	apiClient map[string]awsEcsAPI
 }
 
-func NewAwsEcsAPI(c aws.Config, region []string) AwsEcsAPI {
-	return AwsEcsAPI{
+func NewAwsresqEcsAPI(c aws.Config, region []string) AwsresqEcsAPI {
+	return AwsresqEcsAPI{
 		awsCfg: c,
 		region: region,
 		apiClient: make(map[string]awsEcsAPI, len(region)),
 	}
 }
 
-func (api AwsEcsAPI) Validate(resource string) bool {
+func (api AwsresqEcsAPI) Validate(resource string) bool {
 	switch resource {
 		case "task-definition":
 		return true
@@ -39,7 +40,7 @@ func (api AwsEcsAPI) Validate(resource string) bool {
 	return false
 }
 
-func (api AwsEcsAPI) Query(resource string) (*ResultList, error) {
+func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
 		Service: "ecs",
 		Resource: resource,
@@ -75,7 +76,7 @@ func (api AwsEcsAPI) Query(resource string) (*ResultList, error) {
 	return resultList, err
 }
 
-func (api *AwsEcsAPI) queryTaskDefinition(ctx context.Context, ch chan ResultList, r string) {
+func (api *AwsresqEcsAPI) queryTaskDefinition(ctx context.Context, ch chan ResultList, r string) {
 	resultList := ResultList{
 		Service: "ecs",
 		Resource: "task-definition",
