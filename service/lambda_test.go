@@ -5,22 +5,22 @@ import (
 )
 
 
-func TestValidate(t *testing.T) {
+func TestLambdaValidate(t *testing.T) {
 	cases := []struct {
 		name string
-		api AwsLambdaAPI
+		api AwsresqLambdaAPI
 		resource string
 		expected bool
 	}{
 		{
 			name: "validate function resource",
-			api: AwsLambdaAPI{},
+			api: AwsresqLambdaAPI{},
 			resource: "function",
 			expected: true,
 		},
 		{
 			name: "validate undefined resource",
-			api: AwsLambdaAPI{},
+			api: AwsresqLambdaAPI{},
 			resource: "undefined",
 			expected: false,
 		},
