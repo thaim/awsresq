@@ -38,7 +38,7 @@ func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
 	case "logs":
 		client.api = svc.NewAwsLogsAPI(client.awsCfg)
 	case "lambda":
-		client.api = svc.NewAwsLambdaAPI(client.awsCfg)
+		client.api = svc.NewAwsresqLambdaAPI(client.awsCfg, client.Region)
 	default:
 		log.Error().Msgf("service not supported: %s", service)
 		return nil, fmt.Errorf("service not supported: %s", service)
