@@ -9,17 +9,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type AwsLogsAPI struct {
+type AwsresqLogsAPI struct {
 	awsCfg aws.Config
 }
 
-func NewAwsLogsAPI(c aws.Config) *AwsLogsAPI {
-	return &AwsLogsAPI{
+func NewAwsresqLogsAPI(c aws.Config) *AwsresqLogsAPI {
+	return &AwsresqLogsAPI{
 		awsCfg: c,
 	}
 }
 
-func (api AwsLogsAPI) Validate(resource string) bool {
+func (api AwsresqLogsAPI) Validate(resource string) bool {
 	switch resource {
 	case "log-group":
 		return true
@@ -28,7 +28,7 @@ func (api AwsLogsAPI) Validate(resource string) bool {
 	return false
 }
 
-func (api AwsLogsAPI) Query(resource string) (*ResultList, error) {
+func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
 		Service: "logs",
 		Resource: resource,
