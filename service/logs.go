@@ -33,7 +33,7 @@ func (api AwsresqLogsAPI) Validate(resource string) bool {
 
 func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
-		Service: "logs",
+		Service:  "logs",
 		Resource: resource,
 	}
 
@@ -67,7 +67,7 @@ func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
 
 func (api *AwsresqLogsAPI) queryLogGroup(ctx context.Context, ch chan ResultList, r string) {
 	resultList := ResultList{
-		Service: "logs",
+		Service:  "logs",
 		Resource: "log-group",
 	}
 

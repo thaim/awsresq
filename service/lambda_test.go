@@ -9,27 +9,26 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/lambda/types"
-	"github.com/thaim/awsresq/mock"
 	"github.com/golang/mock/gomock"
+	"github.com/thaim/awsresq/mock"
 )
-
 
 func TestLambdaValidate(t *testing.T) {
 	cases := []struct {
-		name string
-		api AwsresqLambdaAPI
+		name     string
+		api      AwsresqLambdaAPI
 		resource string
 		expected bool
 	}{
 		{
-			name: "validate function resource",
-			api: AwsresqLambdaAPI{},
+			name:     "validate function resource",
+			api:      AwsresqLambdaAPI{},
 			resource: "function",
 			expected: true,
 		},
 		{
-			name: "validate undefined resource",
-			api: AwsresqLambdaAPI{},
+			name:     "validate undefined resource",
+			api:      AwsresqLambdaAPI{},
 			resource: "undefined",
 			expected: false,
 		},
@@ -62,9 +61,9 @@ func TestLambdaQuery(t *testing.T) {
 		AnyTimes()
 
 	cases := []struct {
-		name string
-		expected *lambda.ListFunctionsOutput
-		wantErr bool
+		name      string
+		expected  *lambda.ListFunctionsOutput
+		wantErr   bool
 		expectErr string
 	}{
 		{
