@@ -11,11 +11,13 @@ import (
 
 type AwsresqLogsAPI struct {
 	awsCfg aws.Config
+	region []string
 }
 
-func NewAwsresqLogsAPI(c aws.Config) *AwsresqLogsAPI {
+func NewAwsresqLogsAPI(c aws.Config, region []string) *AwsresqLogsAPI {
 	return &AwsresqLogsAPI{
 		awsCfg: c,
+		region: region,
 	}
 }
 
