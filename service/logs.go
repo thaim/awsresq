@@ -3,23 +3,26 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/rs/zerolog/log"
 )
 
-type AwsLogsAPI struct {
+type AwsresqLogsAPI struct {
 	awsCfg aws.Config
+	region []string
 }
 
-func NewAwsLogsAPI(c aws.Config) *AwsLogsAPI {
-	return &AwsLogsAPI{
+func NewAwsresqLogsAPI(c aws.Config, region []string) *AwsresqLogsAPI {
+	return &AwsresqLogsAPI{
 		awsCfg: c,
+		region: region,
 	}
 }
 
-func (api AwsLogsAPI) Validate(resource string) bool {
+func (api AwsresqLogsAPI) Validate(resource string) bool {
 	switch resource {
 	case "log-group":
 		return true
@@ -28,21 +31,31 @@ func (api AwsLogsAPI) Validate(resource string) bool {
 	return false
 }
 
-func (api AwsLogsAPI) Query(resource string) (*ResultList, error) {
+func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
 		Service: "logs",
 		Resource: resource,
 	}
 
-	awsAPI := cloudwatchlogs.NewFromConfig(api.awsCfg)
 	switch resource {
 	case "log-group":
-		listOutput, err := awsAPI.DescribeLogGroups(context.Background(), nil)
-		if err != nil {
-			return nil, err
+		ch := make(chan ResultList)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		for _, r := range api.region {
+			go api.queryLogGroup(ctx, ch, r)
 		}
-		for _, lg := range listOutput.LogGroups {
-			resultList.Results = append(resultList.Results, lg)
+
+		for range api.region {
+			select {
+			case result := <-ch:
+				if result.Results != nil {
+					resultList.Results = append(resultList.Results, result.Results...)
+				}
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			}
 		}
 	default:
 		log.Error().Msgf("resource '%s' not supported in logs service", resource)
@@ -50,4 +63,26 @@ func (api AwsLogsAPI) Query(resource string) (*ResultList, error) {
 	}
 
 	return resultList, nil
+}
+
+func (api *AwsresqLogsAPI) queryLogGroup(ctx context.Context, ch chan ResultList, r string) {
+	resultList := ResultList{
+		Service: "logs",
+		Resource: "log-group",
+	}
+
+	awsAPI := cloudwatchlogs.NewFromConfig(api.awsCfg, func(o *cloudwatchlogs.Options) {
+		o.Region = r
+	})
+	listOutput, err := awsAPI.DescribeLogGroups(ctx, nil)
+	if err != nil {
+		log.Error().Msgf("error querying log groups in region %s: %s", r, err)
+		return
+	}
+
+	for _, lg := range listOutput.LogGroups {
+		resultList.Results = append(resultList.Results, lg)
+	}
+
+	ch <- resultList
 }
