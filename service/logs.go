@@ -36,15 +36,19 @@ func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
 		Resource: resource,
 	}
 
-	awsAPI := cloudwatchlogs.NewFromConfig(api.awsCfg)
 	switch resource {
 	case "log-group":
-		listOutput, err := awsAPI.DescribeLogGroups(context.Background(), nil)
-		if err != nil {
-			return nil, err
-		}
-		for _, lg := range listOutput.LogGroups {
-			resultList.Results = append(resultList.Results, lg)
+		for _, r := range api.region {
+			awsAPI := cloudwatchlogs.NewFromConfig(api.awsCfg, func(o *cloudwatchlogs.Options) {
+				o.Region = r
+			})
+			listOutput, err := awsAPI.DescribeLogGroups(context.Background(), nil)
+			if err != nil {
+				return nil, err
+			}
+			for _, lg := range listOutput.LogGroups {
+				resultList.Results = append(resultList.Results, lg)
+			}
 		}
 	default:
 		log.Error().Msgf("resource '%s' not supported in logs service", resource)
