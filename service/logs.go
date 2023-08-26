@@ -47,7 +47,7 @@ func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
 			go api.queryLogGroup(ctx, ch, r)
 		}
 
-		for _ = range api.region {
+		for range api.region {
 			select {
 			case result := <-ch:
 				if result.Results != nil {
