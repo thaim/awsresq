@@ -10,27 +10,26 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
-	"github.com/thaim/awsresq/mock"
 	"github.com/golang/mock/gomock"
+	"github.com/thaim/awsresq/mock"
 )
-
 
 func TestEcsValidate(t *testing.T) {
 	cases := []struct {
-		name string
-		api AwsresqEcsAPI
+		name     string
+		api      AwsresqEcsAPI
 		resource string
 		expected bool
 	}{
 		{
-			name: "validate function resource",
-			api: AwsresqEcsAPI{},
+			name:     "validate function resource",
+			api:      AwsresqEcsAPI{},
 			resource: "task-definition",
 			expected: true,
 		},
 		{
-			name: "validate undefined resource",
-			api: AwsresqEcsAPI{},
+			name:     "validate undefined resource",
+			api:      AwsresqEcsAPI{},
 			resource: "undefined",
 			expected: false,
 		},
@@ -106,14 +105,14 @@ func TestEcsQuery(t *testing.T) {
 		AnyTimes()
 
 	cases := []struct {
-		name string
-		resource string
-		expected []*ecs.DescribeTaskDefinitionOutput
-		wantErr bool
+		name      string
+		resource  string
+		expected  []*ecs.DescribeTaskDefinitionOutput
+		wantErr   bool
 		expectErr string
 	}{
 		{
-			name: "query function resource",
+			name:     "query function resource",
 			resource: "task-definition",
 			expected: []*ecs.DescribeTaskDefinitionOutput{
 				{

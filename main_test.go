@@ -6,18 +6,18 @@ import (
 
 func TestGetVersion(t *testing.T) {
 	cases := []struct {
-		name string
-		version string
+		name     string
+		version  string
 		expected string
 	}{
 		{
-			name: "value",
-			version: "0.1.0",
+			name:     "value",
+			version:  "0.1.0",
 			expected: "0.1.0",
 		},
 		{
-			name: "value",
-			version: "",
+			name:     "value",
+			version:  "",
 			expected: "(devel)",
 		},
 	}

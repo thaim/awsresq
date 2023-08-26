@@ -18,22 +18,22 @@ type awsEcsAPI interface {
 }
 
 type AwsresqEcsAPI struct {
-	awsCfg aws.Config
-	region []string
+	awsCfg    aws.Config
+	region    []string
 	apiClient map[string]awsEcsAPI
 }
 
 func NewAwsresqEcsAPI(c aws.Config, region []string) AwsresqEcsAPI {
 	return AwsresqEcsAPI{
-		awsCfg: c,
-		region: region,
+		awsCfg:    c,
+		region:    region,
 		apiClient: make(map[string]awsEcsAPI, len(region)),
 	}
 }
 
 func (api AwsresqEcsAPI) Validate(resource string) bool {
 	switch resource {
-		case "task-definition":
+	case "task-definition":
 		return true
 	}
 
@@ -42,7 +42,7 @@ func (api AwsresqEcsAPI) Validate(resource string) bool {
 
 func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
-		Service: "ecs",
+		Service:  "ecs",
 		Resource: resource,
 	}
 	var err error = nil
@@ -78,7 +78,7 @@ func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {
 
 func (api *AwsresqEcsAPI) queryTaskDefinition(ctx context.Context, ch chan ResultList, r string) {
 	resultList := ResultList{
-		Service: "ecs",
+		Service:  "ecs",
 		Resource: "task-definition",
 	}
 

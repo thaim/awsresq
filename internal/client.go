@@ -2,8 +2,8 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 

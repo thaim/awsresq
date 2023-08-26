@@ -15,15 +15,15 @@ type awsLambdaAPI interface {
 }
 
 type AwsresqLambdaAPI struct {
-	awsCfg aws.Config
-	region []string
+	awsCfg    aws.Config
+	region    []string
 	apiClient map[string]awsLambdaAPI
 }
 
 func NewAwsresqLambdaAPI(c aws.Config, region []string) *AwsresqLambdaAPI {
 	return &AwsresqLambdaAPI{
-		awsCfg: c,
-		region: region,
+		awsCfg:    c,
+		region:    region,
 		apiClient: make(map[string]awsLambdaAPI, len(region)),
 	}
 }
