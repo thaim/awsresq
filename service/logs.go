@@ -1,3 +1,4 @@
+//go:generate mockgen -source=$GOFILE -package=$GOPACKAGE_mock -destination=../mock/$GOFILE
 package service
 
 import (
@@ -10,15 +11,21 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type awsLogsAPI interface {
+	DescribeLogGroups(ctx context.Context, params *cloudwatchlogs.DescribeLogGroupsInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogGroupsOutput, error)
+}
+
 type AwsresqLogsAPI struct {
-	awsCfg aws.Config
-	region []string
+	awsCfg    aws.Config
+	region    []string
+	apiClient map[string]awsLogsAPI
 }
 
 func NewAwsresqLogsAPI(c aws.Config, region []string) *AwsresqLogsAPI {
 	return &AwsresqLogsAPI{
-		awsCfg: c,
-		region: region,
+		awsCfg:    c,
+		region:    region,
+		apiClient: make(map[string]awsLogsAPI, len(region)),
 	}
 }
 
@@ -71,10 +78,13 @@ func (api *AwsresqLogsAPI) queryLogGroup(ctx context.Context, ch chan ResultList
 		Resource: "log-group",
 	}
 
-	awsAPI := cloudwatchlogs.NewFromConfig(api.awsCfg, func(o *cloudwatchlogs.Options) {
-		o.Region = r
-	})
-	listOutput, err := awsAPI.DescribeLogGroups(ctx, nil)
+	if api.apiClient[r] == nil {
+		api.apiClient[r] = cloudwatchlogs.NewFromConfig(api.awsCfg, func(o *cloudwatchlogs.Options) {
+			o.Region = r
+		})
+	}
+
+	listOutput, err := api.apiClient[r].DescribeLogGroups(ctx, nil)
 	if err != nil {
 		log.Error().Msgf("error querying log groups in region %s: %s", r, err)
 		return
