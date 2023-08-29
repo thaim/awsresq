@@ -1,3 +1,4 @@
+//go:generate mockgen -source=$GOFILE -package=$GOPACKAGE_mock -destination=../mock/$GOFILE
 package service
 
 import (
@@ -9,6 +10,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/rs/zerolog/log"
 )
+
+type awsLogsAPI interface {
+	DescribeLogGroups(ctx context.Context, params *cloudwatchlogs.DescribeLogGroupsInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogGroupsOutput, error)
+}
 
 type AwsresqLogsAPI struct {
 	awsCfg aws.Config
