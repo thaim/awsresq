@@ -16,15 +16,15 @@ type awsLogsAPI interface {
 }
 
 type AwsresqLogsAPI struct {
-	awsCfg aws.Config
-	region []string
+	awsCfg    aws.Config
+	region    []string
 	apiClient map[string]awsLogsAPI
 }
 
 func NewAwsresqLogsAPI(c aws.Config, region []string) *AwsresqLogsAPI {
 	return &AwsresqLogsAPI{
-		awsCfg: c,
-		region: region,
+		awsCfg:    c,
+		region:    region,
 		apiClient: make(map[string]awsLogsAPI, len(region)),
 	}
 }

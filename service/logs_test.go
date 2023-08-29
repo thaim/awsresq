@@ -15,14 +15,14 @@ import (
 
 func TestLogsValidate(t *testing.T) {
 	cases := []struct {
-		name string
-		api AwsresqLogsAPI
+		name     string
+		api      AwsresqLogsAPI
 		resource string
 		expected bool
 	}{
 		{
-			name: "validate log-group resource",
-			api: AwsresqLogsAPI{},
+			name:     "validate log-group resource",
+			api:      AwsresqLogsAPI{},
 			resource: "log-group",
 			expected: true,
 		},
@@ -38,7 +38,6 @@ func TestLogsValidate(t *testing.T) {
 		})
 	}
 }
-
 
 func TestLogsQuery(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -73,7 +72,7 @@ func TestLogsQuery(t *testing.T) {
 				},
 			},
 		},
-    }
+	}
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
