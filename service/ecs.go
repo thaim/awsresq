@@ -58,7 +58,7 @@ func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {
 			go api.queryTaskDefinition(ctx, ch, r)
 		}
 
-		for _ = range api.region {
+		for range api.region {
 			select {
 			case result := <-ch:
 				if result.Results != nil {
