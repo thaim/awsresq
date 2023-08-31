@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 )
 
 type awsEcsAPI interface {
@@ -32,12 +33,12 @@ func NewAwsresqEcsAPI(c aws.Config, region []string) AwsresqEcsAPI {
 }
 
 func (api AwsresqEcsAPI) Validate(resource string) bool {
-	switch resource {
-	case "task-definition":
-		return true
+	validResources := []string{
+		"service",
+		"task-definition",
 	}
 
-	return false
+	return slices.Contains(validResources, resource)
 }
 
 func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {

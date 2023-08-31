@@ -22,9 +22,15 @@ func TestEcsValidate(t *testing.T) {
 		expected bool
 	}{
 		{
-			name:     "validate function resource",
+			name:     "validate task-definition resource",
 			api:      AwsresqEcsAPI{},
 			resource: "task-definition",
+			expected: true,
+		},
+		{
+			name:     "validate service resource",
+			api:      AwsresqEcsAPI{},
+			resource: "service",
 			expected: true,
 		},
 		{
