@@ -112,7 +112,7 @@ func (api *AwsresqEcsAPI) queryCluster(ctx context.Context, ch chan ResultList, 
 				types.ClusterFieldTags,
 				types.ClusterFieldStatistics,
 				types.ClusterFieldSettings,
-				types.ClusterFieldConfiguration,
+				types.ClusterFieldConfigurations,
 				types.ClusterFieldAttachments,
 			},
 		}
@@ -121,7 +121,10 @@ func (api *AwsresqEcsAPI) queryCluster(ctx context.Context, ch chan ResultList, 
 			log.Error().Msgf("error describing cluster %s in region %s: %s", arn, r, err)
 			return
 		}
-		resultList.Results = append(resultList.Results, output.Clusters...)
+
+		for _, cluster := range output.Clusters {
+			resultList.Results = append(resultList.Results, cluster)
+		}
 	}
 }
 
@@ -155,7 +158,7 @@ func (api *AwsresqEcsAPI) queryTaskDefinition(ctx context.Context, ch chan Resul
 			return
 		}
 
-		resultList.Results = append(resultList.Results, output)
+		resultList.Results = append(resultList.Results, output.TaskDefinition)
 	}
 
 	ch <- resultList
