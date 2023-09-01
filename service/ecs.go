@@ -18,6 +18,8 @@ type ResourceQueryAPI func(ctx context.Context, ch chan ResultList, region strin
 type awsEcsAPI interface {
 	ListClusters(ctx context.Context, params *ecs.ListClustersInput, optFns ...func(*ecs.Options)) (*ecs.ListClustersOutput, error)
 	DescribeClusters(ctx context.Context, params *ecs.DescribeClustersInput, optFns ...func(*ecs.Options)) (*ecs.DescribeClustersOutput, error)
+	ListServices(ctx context.Context, params *ecs.ListServicesInput, optFns ...func(*ecs.Options)) (*ecs.ListServicesOutput, error)
+	DescribeServices(ctx context.Context, params *ecs.DescribeServicesInput, optFns ...func(*ecs.Options)) (*ecs.DescribeServicesOutput, error)
 	ListTaskDefinitions(ctx context.Context, params *ecs.ListTaskDefinitionsInput, optFns ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error)
 	DescribeTaskDefinition(ctx context.Context, params *ecs.DescribeTaskDefinitionInput, optFns ...func(*ecs.Options)) (*ecs.DescribeTaskDefinitionOutput, error)
 }
@@ -159,6 +161,53 @@ func (api *AwsresqEcsAPI) queryTaskDefinition(ctx context.Context, ch chan Resul
 		}
 
 		resultList.Results = append(resultList.Results, output.TaskDefinition)
+	}
+
+	ch <- resultList
+}
+
+func (api *AwsresqEcsAPI) queryService(ctx context.Context, ch chan ResultList, r string) {
+	resultList := ResultList{
+		Service:  "ecs",
+		Resource: "service",
+	}
+
+	if api.apiClient[r] == nil {
+		api.apiClient[r] = ecs.NewFromConfig(api.awsCfg, func(o *ecs.Options) {
+			o.Region = r
+		})
+	}
+
+	clusterOutput, err := api.apiClient[r].ListClusters(ctx, nil)
+	if err != nil {
+		log.Error().Msgf("error listing clusters in region %s: %s", r, err)
+		return
+	}
+
+	for _, clusterArn := range clusterOutput.ClusterArns {
+		input := &ecs.ListServicesInput{
+			Cluster: aws.String(clusterArn),
+		}
+		listService, err := api.apiClient[r].ListServices(ctx, input)
+		if err != nil {
+			log.Error().Msgf("error listing services in region %s: %s", r, err)
+			return
+		}
+
+		for _, arn := range listService.ServiceArns {
+			input := &ecs.DescribeServicesInput{
+				Cluster:  aws.String(clusterArn),
+			}
+			output, err := api.apiClient[r].DescribeServices(ctx, input)
+			if err != nil {
+				log.Error().Msgf("error describing service %s in region %s: %s", arn, r, err)
+				return
+			}
+
+			for _, service := range output.Services {
+				resultList.Results = append(resultList.Results, service)
+			}
+		}
 	}
 
 	ch <- resultList
