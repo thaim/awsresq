@@ -197,6 +197,7 @@ func (api *AwsresqEcsAPI) queryService(ctx context.Context, ch chan ResultList, 
 		for _, arn := range listService.ServiceArns {
 			input := &ecs.DescribeServicesInput{
 				Cluster:  aws.String(clusterArn),
+				Services: []string{arn},
 			}
 			output, err := api.apiClient[r].DescribeServices(ctx, input)
 			if err != nil {

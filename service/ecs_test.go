@@ -176,3 +176,141 @@ func TestEcsQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestEcsServiceQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsEcsAPI(ctrl)
+
+	mc.EXPECT().
+		ListClusters(gomock.Any(), nil).
+		Return(&ecs.ListClustersOutput{
+			ClusterArns: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01",
+				"arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02",
+			},
+		}, nil).
+		AnyTimes()
+
+	mc.EXPECT().
+		ListServices(gomock.Any(), &ecs.ListServicesInput{
+			Cluster: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01"),
+		}).
+		Return(&ecs.ListServicesOutput{
+			ServiceArns: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster01/testservice01",
+			},
+		}, nil).
+		AnyTimes()
+	mc.EXPECT().
+		ListServices(gomock.Any(), &ecs.ListServicesInput{
+			Cluster: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02"),
+		}).
+		Return(&ecs.ListServicesOutput{
+			ServiceArns: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster02/testservice02",
+			},
+		}, nil).
+		AnyTimes()
+
+	mc.EXPECT().
+		DescribeServices(gomock.Any(), &ecs.DescribeServicesInput{
+			Cluster:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01"),
+			Services: []string{"arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster01/testservice01"},
+		}).
+		Return(&ecs.DescribeServicesOutput{
+			Services: []types.Service{
+				{
+					ClusterArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01"),
+					ServiceArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster01/testservice01"),
+					ServiceName: aws.String("testservice01"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+	mc.EXPECT().
+		DescribeServices(gomock.Any(), &ecs.DescribeServicesInput{
+			Cluster:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02"),
+			Services: []string{"arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster02/testservice02"},
+		}).
+		Return(&ecs.DescribeServicesOutput{
+			Services: []types.Service{
+				{
+					ClusterArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02"),
+					ServiceArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster02/testservice02"),
+					ServiceName: aws.String("testservice02"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		expected  []*types.Service
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name: "query service resource",
+			expected: []*types.Service{
+				{
+					ClusterArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01"),
+					ServiceArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster01/testservice01"),
+					ServiceName: aws.String("testservice01"),
+				},
+				{
+					ClusterArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02"),
+					ServiceArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:service/testcluster02/testservice02"),
+					ServiceName: aws.String("testservice02"),
+				},
+			},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqEcsAPI(config, []string{"ap-northeast-1"})
+			api.apiClient["ap-northeast-1"] = mc
+
+			actual, err := api.Query("service")
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error '%s', but got no error", tt.expectErr)
+				} else if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected error '%s', but got '%s'", tt.expectErr, err.Error())
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+
+			if actual.Service != "ecs" {
+				t.Errorf("expected service 'ecs', but got '%v'", actual.Service)
+			}
+			if actual.Resource != "service" {
+				t.Errorf("expected resource 'task-definition', but got '%v'", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %d results, but got %d", len(tt.expected), len(actual.Results))
+			}
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.Service)
+				if !ok {
+					t.Errorf("expected type types.Service, but got %T", actual.Results[i])
+				}
+				if *tt.expected[i].ClusterArn != *actualOutput.ClusterArn {
+					t.Errorf("expected %+v, but got %+v", tt.expected[i].ClusterArn, actualOutput.ClusterArn)
+				}
+				if *tt.expected[i].ServiceArn != *actualOutput.ServiceArn {
+					t.Errorf("expected %+v, but got %+v", tt.expected[i].ServiceArn, actualOutput.ServiceArn)
+				}
+				if *tt.expected[i].ServiceName != *actualOutput.ServiceName {
+					t.Errorf("expected %+v, but got %+v", *tt.expected[i].ServiceName, *actualOutput.ServiceName)
+				}
+			}
+		})
+	}
+}
