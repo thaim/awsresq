@@ -128,6 +128,8 @@ func (api *AwsresqEcsAPI) queryCluster(ctx context.Context, ch chan ResultList, 
 			resultList.Results = append(resultList.Results, cluster)
 		}
 	}
+
+	ch <- resultList
 }
 
 func (api *AwsresqEcsAPI) queryTaskDefinition(ctx context.Context, ch chan ResultList, r string) {
