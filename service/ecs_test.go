@@ -113,31 +113,22 @@ func TestEcsQuery(t *testing.T) {
 	cases := []struct {
 		name      string
 		resource  string
-		expected  []*ecs.DescribeTaskDefinitionOutput
+		expected  []*types.TaskDefinition
 		wantErr   bool
 		expectErr string
 	}{
 		{
-			name:     "query function resource",
+			name:     "query task-definition resource",
 			resource: "task-definition",
-			expected: []*ecs.DescribeTaskDefinitionOutput{
+			expected: []*types.TaskDefinition{
 				{
-					Tags: []types.Tag{},
-					TaskDefinition: &types.TaskDefinition{
-						TaskDefinitionArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task-definition/testapp:1"),
-					},
+					TaskDefinitionArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task-definition/testapp:1"),
 				},
 				{
-					Tags: []types.Tag{},
-					TaskDefinition: &types.TaskDefinition{
-						TaskDefinitionArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task-definition/testapp:2"),
-					},
+					TaskDefinitionArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task-definition/testapp:2"),
 				},
 				{
-					Tags: []types.Tag{},
-					TaskDefinition: &types.TaskDefinition{
-						TaskDefinitionArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task-definition/sampleapp:1"),
-					},
+					TaskDefinitionArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task-definition/sampleapp:1"),
 				},
 			},
 		},
@@ -174,15 +165,12 @@ func TestEcsQuery(t *testing.T) {
 				t.Errorf("expected %d results, but got %d", len(tt.expected), len(actual.Results))
 			}
 			for i := range tt.expected {
-				actualOutput, ok := actual.Results[i].(*ecs.DescribeTaskDefinitionOutput)
+				actualOutput, ok := actual.Results[i].(*types.TaskDefinition)
 				if !ok {
 					t.Errorf("expected type *ecs.DescribeTaskDefinitionOutput, but got %T", actual.Results[i])
 				}
-				if !reflect.DeepEqual(tt.expected[i].TaskDefinition, actualOutput.TaskDefinition) {
-					t.Errorf("expected %+v, but got %+v", tt.expected[i].TaskDefinition, actualOutput.TaskDefinition)
-				}
-				if !reflect.DeepEqual(tt.expected[i].Tags, actualOutput.Tags) {
-					t.Errorf("expected %+v, but got %+v", tt.expected[i].Tags, actualOutput.Tags)
+				if !reflect.DeepEqual(tt.expected[i], actualOutput) {
+					t.Errorf("expected %+v, but got %+v", tt.expected[i], actualOutput)
 				}
 			}
 		})
