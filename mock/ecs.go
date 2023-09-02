@@ -35,6 +35,46 @@ func (m *MockawsEcsAPI) EXPECT() *MockawsEcsAPIMockRecorder {
 	return m.recorder
 }
 
+// DescribeClusters mocks base method.
+func (m *MockawsEcsAPI) DescribeClusters(ctx context.Context, params *ecs.DescribeClustersInput, optFns ...func(*ecs.Options)) (*ecs.DescribeClustersOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DescribeClusters", varargs...)
+	ret0, _ := ret[0].(*ecs.DescribeClustersOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DescribeClusters indicates an expected call of DescribeClusters.
+func (mr *MockawsEcsAPIMockRecorder) DescribeClusters(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeClusters", reflect.TypeOf((*MockawsEcsAPI)(nil).DescribeClusters), varargs...)
+}
+
+// DescribeServices mocks base method.
+func (m *MockawsEcsAPI) DescribeServices(ctx context.Context, params *ecs.DescribeServicesInput, optFns ...func(*ecs.Options)) (*ecs.DescribeServicesOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DescribeServices", varargs...)
+	ret0, _ := ret[0].(*ecs.DescribeServicesOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DescribeServices indicates an expected call of DescribeServices.
+func (mr *MockawsEcsAPIMockRecorder) DescribeServices(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeServices", reflect.TypeOf((*MockawsEcsAPI)(nil).DescribeServices), varargs...)
+}
+
 // DescribeTaskDefinition mocks base method.
 func (m *MockawsEcsAPI) DescribeTaskDefinition(ctx context.Context, params *ecs.DescribeTaskDefinitionInput, optFns ...func(*ecs.Options)) (*ecs.DescribeTaskDefinitionOutput, error) {
 	m.ctrl.T.Helper()
@@ -53,6 +93,46 @@ func (mr *MockawsEcsAPIMockRecorder) DescribeTaskDefinition(ctx, params interfac
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, params}, optFns...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeTaskDefinition", reflect.TypeOf((*MockawsEcsAPI)(nil).DescribeTaskDefinition), varargs...)
+}
+
+// ListClusters mocks base method.
+func (m *MockawsEcsAPI) ListClusters(ctx context.Context, params *ecs.ListClustersInput, optFns ...func(*ecs.Options)) (*ecs.ListClustersOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListClusters", varargs...)
+	ret0, _ := ret[0].(*ecs.ListClustersOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListClusters indicates an expected call of ListClusters.
+func (mr *MockawsEcsAPIMockRecorder) ListClusters(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClusters", reflect.TypeOf((*MockawsEcsAPI)(nil).ListClusters), varargs...)
+}
+
+// ListServices mocks base method.
+func (m *MockawsEcsAPI) ListServices(ctx context.Context, params *ecs.ListServicesInput, optFns ...func(*ecs.Options)) (*ecs.ListServicesOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListServices", varargs...)
+	ret0, _ := ret[0].(*ecs.ListServicesOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListServices indicates an expected call of ListServices.
+func (mr *MockawsEcsAPIMockRecorder) ListServices(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListServices", reflect.TypeOf((*MockawsEcsAPI)(nil).ListServices), varargs...)
 }
 
 // ListTaskDefinitions mocks base method.
