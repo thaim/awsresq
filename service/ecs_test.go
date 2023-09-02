@@ -52,7 +52,107 @@ func TestEcsValidate(t *testing.T) {
 	}
 }
 
-func TestEcsQuery(t *testing.T) {
+func TestEcsClusterQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsEcsAPI(ctrl)
+
+	mc.EXPECT().
+		ListClusters(gomock.Any(), nil).
+		Return(&ecs.ListClustersOutput{
+			ClusterArns: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:cluster/test-cluster",
+			},
+		}, nil).
+		AnyTimes()
+	mc.EXPECT().
+		DescribeClusters(gomock.Any(), &ecs.DescribeClustersInput{
+			Clusters: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:cluster/test-cluster",
+			},
+			Include: []types.ClusterField{
+				types.ClusterFieldTags,
+				types.ClusterFieldStatistics,
+				types.ClusterFieldSettings,
+				types.ClusterFieldConfigurations,
+				types.ClusterFieldAttachments,
+			},
+		}).
+		Return(&ecs.DescribeClustersOutput{
+			Clusters: []types.Cluster{
+				{
+					ClusterArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/test-cluster"),
+					ClusterName: aws.String("test-cluster"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		expected  []types.Cluster
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name: "query cluster resource",
+			expected: []types.Cluster{
+				{
+					ClusterArn:  aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/test-cluster"),
+					ClusterName: aws.String("test-cluster"),
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqEcsAPI(config, []string{"ap-northeast-1"})
+			api.apiClient["ap-northeast-1"] = mc
+
+			actual, err := api.Query("cluster")
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error, but got nil")
+				}
+				if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected %v, but got %v", tt.expectErr, err.Error())
+				}
+			}
+			if err != nil {
+				t.Errorf("expected nil, but got %v", err.Error())
+			}
+
+			if actual.Service != "ecs" {
+				t.Errorf("expected ecs, but got %v", actual.Service)
+			}
+			if actual.Resource != "cluster" {
+				t.Errorf("expected cluster, but got %v", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %v, but got %v", len(tt.expected), len(actual.Results))
+			}
+
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.Cluster)
+				if !ok {
+					t.Errorf("expected types.Cluster, but got %T", actual.Results[i])
+				}
+				if !reflect.DeepEqual(actualOutput.ClusterArn, tt.expected[i].ClusterArn) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].ClusterArn, actualOutput.ClusterArn)
+				}
+				if !reflect.DeepEqual(actualOutput.ClusterName, tt.expected[i].ClusterName) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].ClusterName, actualOutput.ClusterName)
+				}
+			}
+		})
+	}
+}
+
+func TestEcsTaskDefinitionQuery(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mc := mock_service.NewMockawsEcsAPI(ctrl)
 
