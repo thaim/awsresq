@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.21.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.37
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.23.5
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.29.6
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.30.0
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.39.5
 	github.com/golang/mock v1.6.0
 	github.com/rs/zerolog v1.30.0
