@@ -25,6 +25,7 @@ func NewAwsresqEfsAPI(awsCfg aws.Config, region []string) *AwsresqEfsAPI {
 	return &AwsresqEfsAPI{
 		awsCfg: awsCfg,
 		region: region,
+		apiClient: make(map[string]awsEfsAPI, len(region)),
 	}
 }
 
