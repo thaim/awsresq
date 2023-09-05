@@ -90,7 +90,9 @@ func (api *AwsresqEfsAPI) queryFileSystem(ctx context.Context, ch chan ResultLis
 		log.Error().Err(err).Msgf("Failed to describe file systems in %s", r)
 		return
 	}
-	resultList.Results = append(resultList.Results, listOutput.FileSystems)
+	if len(listOutput.FileSystems) > 0 {
+		resultList.Results = append(resultList.Results, listOutput.FileSystems)
+	}
 
 	ch <- resultList
 }
