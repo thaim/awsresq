@@ -91,7 +91,9 @@ func (api *AwsresqEfsAPI) queryFileSystem(ctx context.Context, ch chan ResultLis
 		return
 	}
 	if len(listOutput.FileSystems) > 0 {
-		resultList.Results = append(resultList.Results, listOutput.FileSystems)
+		for _, fs := range listOutput.FileSystems {
+			resultList.Results = append(resultList.Results, fs)
+		}
 	}
 
 	ch <- resultList
