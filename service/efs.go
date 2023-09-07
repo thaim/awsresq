@@ -16,15 +16,15 @@ type awsEfsAPI interface {
 }
 
 type AwsresqEfsAPI struct {
-	awsCfg aws.Config
-    region []string
+	awsCfg    aws.Config
+	region    []string
 	apiClient map[string]awsEfsAPI
 }
 
 func NewAwsresqEfsAPI(awsCfg aws.Config, region []string) *AwsresqEfsAPI {
 	return &AwsresqEfsAPI{
-		awsCfg: awsCfg,
-		region: region,
+		awsCfg:    awsCfg,
+		region:    region,
 		apiClient: make(map[string]awsEfsAPI, len(region)),
 	}
 }
@@ -39,7 +39,7 @@ func (a *AwsresqEfsAPI) Validate(resource string) bool {
 
 func (api AwsresqEfsAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
-		Service: "efs",
+		Service:  "efs",
 		Resource: resource,
 	}
 	var err error = nil
@@ -75,7 +75,7 @@ func (api AwsresqEfsAPI) Query(resource string) (*ResultList, error) {
 
 func (api *AwsresqEfsAPI) queryFileSystem(ctx context.Context, ch chan ResultList, r string) {
 	resultList := ResultList{
-		Service: "efs",
+		Service:  "efs",
 		Resource: "file-system",
 	}
 

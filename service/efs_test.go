@@ -114,7 +114,7 @@ func TestEfsFileSystemQuery(t *testing.T) {
 				if !ok {
 					t.Errorf("expected types.FileSystemDescription, but got %T", actual.Results[i])
 				}
-				if !reflect.DeepEqual(actualOutput.FileSystemId , tt.expected[i].FileSystemId) {
+				if !reflect.DeepEqual(actualOutput.FileSystemId, tt.expected[i].FileSystemId) {
 					t.Errorf("expected %v, but got %v", tt.expected[i].FileSystemId, actualOutput.FileSystemId)
 				}
 			}
