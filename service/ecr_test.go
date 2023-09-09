@@ -61,9 +61,9 @@ func TestEcrRepositoryQuery(t *testing.T) {
 		}, nil)
 
 	cases := []struct {
-		name     string
-		expected []types.Repository
-		wantErr  bool
+		name      string
+		expected  []types.Repository
+		wantErr   bool
 		expectErr string
 	}{
 		{
