@@ -33,6 +33,8 @@ func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
 	client.Region = buildRegion(region)
 
 	switch service {
+	case "ecr":
+		client.api = svc.NewAwsresqEcrAPI(client.awsCfg, client.Region)
 	case "ecs":
 		client.api = svc.NewAwsresqEcsAPI(client.awsCfg, client.Region)
 	case "efs":
