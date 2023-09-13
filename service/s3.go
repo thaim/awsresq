@@ -17,15 +17,15 @@ type awsS3API interface {
 }
 
 type AwsresqS3API struct {
-	awsCfg aws.Config
-	region []string
+	awsCfg    aws.Config
+	region    []string
 	apiClient map[string]awsS3API
 }
 
 func NewAwsresqS3API(awsConfig aws.Config, region []string) *AwsresqS3API {
 	return &AwsresqS3API{
-		awsCfg: awsConfig,
-		region: region,
+		awsCfg:    awsConfig,
+		region:    region,
 		apiClient: make(map[string]awsS3API, len(region)),
 	}
 }
@@ -40,7 +40,7 @@ func (api AwsresqS3API) Validate(resource string) bool {
 
 func (api AwsresqS3API) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
-		Service: "s3",
+		Service:  "s3",
 		Resource: resource,
 	}
 	var apiQuery ResourceQueryAPI
@@ -74,7 +74,7 @@ func (api AwsresqS3API) Query(resource string) (*ResultList, error) {
 
 func (api *AwsresqS3API) queryBucket(ctx context.Context, ch chan ResultList, region string) {
 	resultList := ResultList{
-		Service: "s3",
+		Service:  "s3",
 		Resource: "bucket",
 	}
 

@@ -16,8 +16,8 @@ import (
 
 func TestS3Validate(t *testing.T) {
 	cases := []struct {
-		name string
-		api  AwsresqS3API
+		name     string
+		api      AwsresqS3API
 		resource string
 		expected bool
 	}{
