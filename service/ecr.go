@@ -43,15 +43,13 @@ func (api AwsresqEcrAPI) Query(resource string) (*ResultList, error) {
 		Service:  "ecr",
 		Resource: resource,
 	}
-	var err error = nil
 
 	var apiQuery ResourceQueryAPI
 	switch resource {
 	case "repository":
 		apiQuery = api.queryRepository
 	default:
-		log.Error().Msgf("resource %s not supported in ecr service", resource)
-		return nil, err
+		return nil, fmt.Errorf("resource %s not supported in ecr service", resource)
 	}
 
 	ch := make(chan ResultList)
@@ -64,15 +62,14 @@ func (api AwsresqEcrAPI) Query(resource string) (*ResultList, error) {
 
 	for range api.region {
 		select {
-		case <-ctx.Done():
-			err = fmt.Errorf("ecr: %v", ctx.Err())
-			log.Error().Msgf("ecr: %v", ctx.Err())
 		case res := <-ch:
 			resultList.Results = append(resultList.Results, res.Results...)
+		case <-ctx.Done():
+			return nil, ctx.Err()
 		}
 	}
 
-	return resultList, err
+	return resultList, nil
 }
 
 func (api AwsresqEcrAPI) queryRepository(ctx context.Context, ch chan ResultList, region string) {

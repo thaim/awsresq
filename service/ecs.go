@@ -64,7 +64,6 @@ func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {
 	case "task-definition":
 		apiQuery = api.queryTaskDefinition
 	default:
-		log.Error().Msgf("resource '%s' not supported in ecs service", resource)
 		return nil, fmt.Errorf("resource '%s' not supported in ecs service", resource)
 	}
 
@@ -146,7 +145,7 @@ func (api *AwsresqEcsAPI) queryTaskDefinition(ctx context.Context, ch chan Resul
 
 	listOutput, err := api.apiClient[r].ListTaskDefinitions(ctx, nil)
 	if err != nil {
-		fmt.Println(err)
+		log.Error().Err(err).Msgf("Failed to list task definitions in %s", r)
 		return
 	}
 	for _, arn := range listOutput.TaskDefinitionArns {
@@ -158,7 +157,7 @@ func (api *AwsresqEcsAPI) queryTaskDefinition(ctx context.Context, ch chan Resul
 		}
 		output, err := api.apiClient[r].DescribeTaskDefinition(ctx, input)
 		if err != nil {
-			fmt.Println(err)
+			log.Error().Err(err).Msgf("Failed to describe task definition in %s", r)
 			return
 		}
 

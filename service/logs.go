@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 )
 
 type awsLogsAPI interface {
@@ -30,12 +31,11 @@ func NewAwsresqLogsAPI(c aws.Config, region []string) *AwsresqLogsAPI {
 }
 
 func (api AwsresqLogsAPI) Validate(resource string) bool {
-	switch resource {
-	case "log-group":
-		return true
+	validResoruces := []string{
+		"log-group",
 	}
 
-	return false
+	return slices.Contains(validResoruces, resource)
 }
 
 func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
@@ -44,29 +44,31 @@ func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
 		Resource: resource,
 	}
 
+	var apiQuery ResourceQueryAPI
 	switch resource {
 	case "log-group":
-		ch := make(chan ResultList)
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		for _, r := range api.region {
-			go api.queryLogGroup(ctx, ch, r)
-		}
-
-		for range api.region {
-			select {
-			case result := <-ch:
-				if result.Results != nil {
-					resultList.Results = append(resultList.Results, result.Results...)
-				}
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			}
-		}
+		apiQuery = api.queryLogGroup
 	default:
-		log.Error().Msgf("resource '%s' not supported in logs service", resource)
-		return nil, fmt.Errorf("resource '%s' not supported in logs service", resource)
+		return nil, fmt.Errorf("resource %s not supported in logs service", resource)
+	}
+
+	ch := make(chan ResultList)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	for _, r := range api.region {
+		go apiQuery(ctx, ch, r)
+	}
+
+	for range api.region {
+		select {
+		case result := <-ch:
+			if result.Results != nil {
+				resultList.Results = append(resultList.Results, result.Results...)
+			}
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
 	}
 
 	return resultList, nil

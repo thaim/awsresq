@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -42,15 +43,13 @@ func (api AwsresqEfsAPI) Query(resource string) (*ResultList, error) {
 		Service:  "efs",
 		Resource: resource,
 	}
-	var err error = nil
 
 	var apiQuery ResourceQueryAPI
 	switch resource {
 	case "file-system":
 		apiQuery = api.queryFileSystem
 	default:
-		log.Error().Msgf("resource %s not supported in efs service", resource)
-		return nil, err
+		return nil, fmt.Errorf("resource %s not supported in efs service", resource)
 	}
 
 	ch := make(chan ResultList)
