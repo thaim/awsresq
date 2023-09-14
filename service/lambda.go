@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 )
 
 type awsLambdaAPI interface {
@@ -30,12 +31,11 @@ func NewAwsresqLambdaAPI(c aws.Config, region []string) *AwsresqLambdaAPI {
 }
 
 func (api AwsresqLambdaAPI) Validate(resource string) bool {
-	switch resource {
-	case "function":
-		return true
+	validResources := []string{
+		"function",
 	}
 
-	return false
+	return slices.Contains(validResources, resource)
 }
 
 func (api AwsresqLambdaAPI) Query(resource string) (*ResultList, error) {

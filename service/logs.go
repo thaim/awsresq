@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 )
 
 type awsLogsAPI interface {
@@ -30,12 +31,11 @@ func NewAwsresqLogsAPI(c aws.Config, region []string) *AwsresqLogsAPI {
 }
 
 func (api AwsresqLogsAPI) Validate(resource string) bool {
-	switch resource {
-	case "log-group":
-		return true
+	validResoruces := []string{
+		"log-group",
 	}
 
-	return false
+	return slices.Contains(validResoruces, resource)
 }
 
 func (api AwsresqLogsAPI) Query(resource string) (*ResultList, error) {
