@@ -64,7 +64,6 @@ func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {
 	case "task-definition":
 		apiQuery = api.queryTaskDefinition
 	default:
-		log.Error().Msgf("resource '%s' not supported in ecs service", resource)
 		return nil, fmt.Errorf("resource '%s' not supported in ecs service", resource)
 	}
 

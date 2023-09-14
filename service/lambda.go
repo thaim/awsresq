@@ -49,7 +49,6 @@ func (api AwsresqLambdaAPI) Query(resource string) (*ResultList, error) {
 	case "function":
 		apiQuery = api.queryFunction
 	default:
-		log.Error().Msgf("resource '%s' not supported in lambda service", resource)
 		return nil, fmt.Errorf("resource '%s' not supported in lambda service", resource)
 	}
 
