@@ -14,7 +14,7 @@ test: ## Run test
 	go test -coverprofile=coverage.out -covermode=atomic ./...
 
 .PHONY: mock
-mock:
+mock: ## Generate mock files
 	go generate ./...
 
 .PHONY: clean
