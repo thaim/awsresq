@@ -16,3 +16,7 @@ test: ## Run test
 .PHONY: mock
 mock:
 	go generate ./...
+
+.PHONY: clean
+clean: ## Remove temporary files
+	rm -f *~ service/*~ internal/*~ mock/*~ bin/awsresq
