@@ -19,4 +19,4 @@ mock: ## Generate mock files
 
 .PHONY: clean
 clean: ## Remove temporary files
-	rm -f *~ service/*~ internal/*~ mock/*~ bin/awsresq
+	rm -f *~ service/*~ internal/*~ mock/*~ bin/awsresq coverage.out
