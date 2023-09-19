@@ -1,4 +1,4 @@
-GIT_VERSION := $(shell git describe --abbrev=0 --tags)
+GIT_VERSION := $(shell git describe --abbrev=0 --tags 2>/dev/null)
 
 ifndef GIT_VERSION
 GIT_VERSION = main
@@ -14,5 +14,9 @@ test: ## Run test
 	go test -coverprofile=coverage.out -covermode=atomic ./...
 
 .PHONY: mock
-mock:
+mock: ## Generate mock files
 	go generate ./...
+
+.PHONY: clean
+clean: ## Remove temporary files
+	rm -f *~ service/*~ internal/*~ mock/*~ bin/awsresq coverage.out
