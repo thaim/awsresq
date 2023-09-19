@@ -1,4 +1,4 @@
-GIT_VERSION := $(shell git describe --abbrev=0 --tags)
+GIT_VERSION := $(shell git describe --abbrev=0 --tags 2>/dev/null)
 
 ifndef GIT_VERSION
 GIT_VERSION = main
