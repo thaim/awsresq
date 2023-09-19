@@ -32,7 +32,7 @@ func NewAwsresqCloudwatchAPI(c aws.Config, region []string) *AwsresqCloudwatchAP
 
 func (api AwsresqCloudwatchAPI) Validate(resource string) bool {
 	validResource := []string{
-		"metrics",
+		"metric",
 	}
 	return slices.Contains(validResource, resource)
 }
@@ -45,8 +45,8 @@ func (api AwsresqCloudwatchAPI) Query(resource string) (*ResultList, error) {
 
 	var apiQuery ResourceQueryAPI
 	switch resource {
-	case "metrics":
-		apiQuery = api.queryCloudwatchMetrics
+	case "metric":
+		apiQuery = api.queryCloudwatchMetric
 	default:
 		return nil, fmt.Errorf("resource %s is not supported in cloudwatch service", resource)
 	}
@@ -71,10 +71,10 @@ func (api AwsresqCloudwatchAPI) Query(resource string) (*ResultList, error) {
 	return resultList, nil
 }
 
-func (api *AwsresqCloudwatchAPI) queryCloudwatchMetrics(ctx context.Context, ch chan ResultList, r string) {
+func (api *AwsresqCloudwatchAPI) queryCloudwatchMetric(ctx context.Context, ch chan ResultList, r string) {
 	resultList := ResultList{
 		Service:  "cloudwatch",
-		Resource: "metrics",
+		Resource: "metric",
 	}
 
 	if api.apiClient[r] == nil {
@@ -89,8 +89,8 @@ func (api *AwsresqCloudwatchAPI) queryCloudwatchMetrics(ctx context.Context, ch 
 		return
 	}
 
-	for _, metrics := range listOutput.Metrics {
-		resultList.Results = append(resultList.Results, metrics)
+	for _, metric := range listOutput.Metrics {
+		resultList.Results = append(resultList.Results, metric)
 	}
 
 	ch <- resultList
