@@ -35,6 +35,8 @@ func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
 	switch service {
 	case "cloudwatch":
 		client.api = svc.NewAwsresqCloudwatchAPI(client.awsCfg, client.Region)
+	case "ec2":
+		client.api = svc.NewAwsresqEc2API(client.awsCfg, client.Region)
 	case "ecr":
 		client.api = svc.NewAwsresqEcrAPI(client.awsCfg, client.Region)
 	case "ecs":
