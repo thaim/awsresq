@@ -73,7 +73,7 @@ func (api AwsresqEc2API) Query(resource string) (*ResultList, error) {
 
 func (api AwsresqEc2API) queryEc2Instance(ctx context.Context, ch chan ResultList, region string) {
 	resultList := ResultList{
-		Service: "ec2",
+		Service:  "ec2",
 		Resource: "instance",
 	}
 

@@ -16,22 +16,22 @@ import (
 
 func TestEc2Validate(t *testing.T) {
 	cases := []struct {
-		name string
-		api  AwsresqEc2API
+		name     string
+		api      AwsresqEc2API
 		resource string
-		expect bool
+		expect   bool
 	}{
 		{
-			name: "valid instance resource",
-			api: AwsresqEc2API{},
+			name:     "valid instance resource",
+			api:      AwsresqEc2API{},
 			resource: "instance",
-			expect: true,
+			expect:   true,
 		},
 		{
-			name: "undefined resource",
-			api: AwsresqEc2API{},
+			name:     "undefined resource",
+			api:      AwsresqEc2API{},
 			resource: "undefined",
-			expect: false,
+			expect:   false,
 		},
 	}
 
@@ -57,7 +57,7 @@ func TestEc2InstanceQuery(t *testing.T) {
 				{
 					Instances: []types.Instance{
 						{
-							InstanceId: aws.String("i-1234567890abcdef0"),
+							InstanceId:   aws.String("i-1234567890abcdef0"),
 							InstanceType: types.InstanceTypeT2Micro,
 						},
 					},
@@ -67,16 +67,16 @@ func TestEc2InstanceQuery(t *testing.T) {
 		AnyTimes()
 
 	cases := []struct {
-		name string
-		expected []types.Instance
-		wantErr bool
+		name      string
+		expected  []types.Instance
+		wantErr   bool
 		expectErr string
 	}{
 		{
 			name: "valid instance query",
 			expected: []types.Instance{
 				{
-					InstanceId: aws.String("i-1234567890abcdef0"),
+					InstanceId:   aws.String("i-1234567890abcdef0"),
 					InstanceType: types.InstanceTypeT2Micro,
 				},
 			},
@@ -130,4 +130,3 @@ func TestEc2InstanceQuery(t *testing.T) {
 		})
 	}
 }
-
