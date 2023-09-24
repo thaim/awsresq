@@ -55,8 +55,8 @@ func TestCloudformationStackQuery(t *testing.T) {
 		Return(&cloudformation.DescribeStacksOutput{
 			Stacks: []types.Stack{
 				{
-					StackId: aws.String("arn:aws:cloudformation:us-east-1:123456789012:stack/stack-name/guid"),
-					StackName: aws.String("stack-name"),
+					StackId:     aws.String("arn:aws:cloudformation:us-east-1:123456789012:stack/stack-name/guid"),
+					StackName:   aws.String("stack-name"),
 					StackStatus: types.StackStatusCreateComplete,
 				},
 			},
@@ -73,8 +73,8 @@ func TestCloudformationStackQuery(t *testing.T) {
 			name: "query stack resource",
 			expected: []types.Stack{
 				{
-					StackId: aws.String("arn:aws:cloudformation:us-east-1:123456789012:stack/stack-name/guid"),
-					StackName: aws.String("stack-name"),
+					StackId:     aws.String("arn:aws:cloudformation:us-east-1:123456789012:stack/stack-name/guid"),
+					StackName:   aws.String("stack-name"),
 					StackStatus: types.StackStatusCreateComplete,
 				},
 			},
@@ -131,4 +131,3 @@ func TestCloudformationStackQuery(t *testing.T) {
 		})
 	}
 }
-

@@ -76,7 +76,7 @@ func (api AwsresqCloudformationAPI) Query(resource string) (*ResultList, error) 
 
 func (api *AwsresqCloudformationAPI) queryCloudformationStack(ctx context.Context, ch chan ResultList, region string) {
 	resultList := ResultList{
-		Service: "cloudformation",
+		Service:  "cloudformation",
 		Resource: "stack",
 	}
 
@@ -98,5 +98,3 @@ func (api *AwsresqCloudformationAPI) queryCloudformationStack(ctx context.Contex
 
 	ch <- resultList
 }
-
-
