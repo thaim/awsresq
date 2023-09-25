@@ -130,3 +130,84 @@ func TestEc2InstanceQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestEc2SecurityGroupQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsEc2API(ctrl)
+
+	mc.EXPECT().
+		DescribeSecurityGroups(gomock.Any(), nil).
+		Return(&ec2.DescribeSecurityGroupsOutput{
+			SecurityGroups: []types.SecurityGroup{
+				{
+					GroupId:   aws.String("sg-1234567890abcdef0"),
+					GroupName: aws.String("test"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		expected  []types.SecurityGroup
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name: "valid security-group query",
+			expected: []types.SecurityGroup{
+				{
+					GroupId:   aws.String("sg-1234567890abcdef0"),
+					GroupName: aws.String("test"),
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqEc2API(config, []string{"ap-northeast-1"})
+			api.apiClient["ap-northeast-1"] = mc
+
+			actual, err := api.Query("security-group")
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error, but got nil")
+				}
+				if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected %v, but got %v", tt.expectErr, err.Error())
+				}
+			}
+			if err != nil {
+				t.Errorf("expected nil, but got %v", err.Error())
+			}
+
+			if actual.Service != "ec2" {
+				t.Errorf("expected ec2, but got %v", actual.Service)
+			}
+			if actual.Resource != "security-group" {
+				t.Errorf("expected security-group, but got %v", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %v, but got %v", len(tt.expected), len(actual.Results))
+			}
+
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.SecurityGroup)
+				if !ok {
+					t.Errorf("expected types.SecurityGroup, but got %T", actual.Results[i])
+				}
+				if !reflect.DeepEqual(actualOutput.GroupId, tt.expected[i].GroupId) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].GroupId, actualOutput.GroupId)
+				}
+				if !reflect.DeepEqual(actualOutput.GroupName, tt.expected[i].GroupName) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].GroupName, actualOutput.GroupName)
+				}
+			}
+		})
+	}
+}
