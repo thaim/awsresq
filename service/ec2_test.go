@@ -211,3 +211,89 @@ func TestEc2SecurityGroupQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestEc2VpcQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsEc2API(ctrl)
+
+	mc.EXPECT().
+		DescribeVpcs(gomock.Any(), nil).
+		Return(&ec2.DescribeVpcsOutput{
+			Vpcs: []types.Vpc{
+				{
+					VpcId:     aws.String("vpc-1234567890abcdef0"),
+					CidrBlock: aws.String("172.31.0.0/16"),
+					IsDefault: aws.Bool(true),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		expected  []types.Vpc
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name: "valid vpc query",
+			expected: []types.Vpc{
+				{
+					VpcId:     aws.String("vpc-1234567890abcdef0"),
+					CidrBlock: aws.String("172.31.0.0/16"),
+					IsDefault: aws.Bool(true),
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqEc2API(config, []string{"ap-northeast-1"})
+			api.apiClient["ap-northeast-1"] = mc
+
+			actual, err := api.Query("vpc")
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error, but got nil")
+				}
+				if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected %v, but got %v", tt.expectErr, err.Error())
+				}
+			}
+			if err != nil {
+				t.Errorf("expected nil, but got %v", err.Error())
+			}
+
+			if actual.Service != "ec2" {
+				t.Errorf("expected ec2, but got %v", actual.Service)
+			}
+			if actual.Resource != "vpc" {
+				t.Errorf("expected vpc, but got %v", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %v, but got %v", len(tt.expected), len(actual.Results))
+			}
+
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.Vpc)
+				if !ok {
+					t.Errorf("expected types.Vpc, but got %T", actual.Results[i])
+				}
+				if !reflect.DeepEqual(actualOutput.VpcId, tt.expected[i].VpcId) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].VpcId, actualOutput.VpcId)
+				}
+				if !reflect.DeepEqual(actualOutput.CidrBlock, tt.expected[i].CidrBlock) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].CidrBlock, actualOutput.CidrBlock)
+				}
+				if !reflect.DeepEqual(actualOutput.IsDefault, tt.expected[i].IsDefault) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].IsDefault, actualOutput.IsDefault)
+				}
+			}
+		})
+	}
+}
