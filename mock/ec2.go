@@ -74,3 +74,23 @@ func (mr *MockawsEc2APIMockRecorder) DescribeSecurityGroups(ctx, params interfac
 	varargs := append([]interface{}{ctx, params}, optFns...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeSecurityGroups", reflect.TypeOf((*MockawsEc2API)(nil).DescribeSecurityGroups), varargs...)
 }
+
+// DescribeVpcs mocks base method.
+func (m *MockawsEc2API) DescribeVpcs(ctx context.Context, params *ec2.DescribeVpcsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVpcsOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DescribeVpcs", varargs...)
+	ret0, _ := ret[0].(*ec2.DescribeVpcsOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DescribeVpcs indicates an expected call of DescribeVpcs.
+func (mr *MockawsEc2APIMockRecorder) DescribeVpcs(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeVpcs", reflect.TypeOf((*MockawsEc2API)(nil).DescribeVpcs), varargs...)
+}
