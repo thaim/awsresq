@@ -15,6 +15,7 @@ import (
 type awsEc2API interface {
 	DescribeInstances(ctx context.Context, params *ec2.DescribeInstancesInput, optFns ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)
 	DescribeSecurityGroups(ctx context.Context, params *ec2.DescribeSecurityGroupsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeSecurityGroupsOutput, error)
+	DescribeVpcs(ctx context.Context, params *ec2.DescribeVpcsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeVpcsOutput, error)
 }
 
 type AwsresqEc2API struct {
@@ -35,6 +36,7 @@ func (api AwsresqEc2API) Validate(resource string) bool {
 	validResource := []string{
 		"instance",
 		"security-group",
+		"vpc",
 	}
 	return slices.Contains(validResource, resource)
 }
@@ -51,6 +53,8 @@ func (api AwsresqEc2API) Query(resource string) (*ResultList, error) {
 		apiQuery = api.queryEc2Instance
 	case "security-group":
 		apiQuery = api.queryEc2SecurityGroup
+	case "vpc":
+		apiQuery = api.queryEc2Vpc
 	default:
 		return nil, fmt.Errorf("resource %s is not supported in ec2 service", resource)
 	}
@@ -120,6 +124,30 @@ func (api AwsresqEc2API) queryEc2SecurityGroup(ctx context.Context, ch chan Resu
 	}
 	for _, securityGroup := range listOutput.SecurityGroups {
 		resultList.Results = append(resultList.Results, securityGroup)
+	}
+
+	ch <- resultList
+}
+
+func (api AwsresqEc2API) queryEc2Vpc(ctx context.Context, ch chan ResultList, region string) {
+	resultList := ResultList{
+		Service:  "ec2",
+		Resource: "vpc",
+	}
+
+	if api.apiClient[region] == nil {
+		api.apiClient[region] = ec2.NewFromConfig(api.awsCfg, func(o *ec2.Options) {
+			o.Region = region
+		})
+	}
+
+	listOutput, err := api.apiClient[region].DescribeVpcs(ctx, nil)
+	if err != nil {
+		log.Error().Err(err).Msgf("failed to describe ec2 vpc in region %s", region)
+		return
+	}
+	for _, vpc := range listOutput.Vpcs {
+		resultList.Results = append(resultList.Results, vpc)
 	}
 
 	ch <- resultList
