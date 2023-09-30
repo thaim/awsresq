@@ -89,6 +89,9 @@ func (api AwsresqIamAPI) queryIamRole(ctx context.Context, ch chan ResultList, r
 		return
 	}
 	for _, role := range listOutput.Roles {
+		// AssumeRolePolicyDocument is URL encoded. It needs to be unescaped as below for query result.
+		// doc, _ := url.PathUnescape(*role.AssumeRolePolicyDocument)
+		// role.AssumeRolePolicyDocument = aws.String(doc)
 		resultList.Results = append(resultList.Results, role)
 	}
 
