@@ -17,15 +17,15 @@ type awsConfigAPI interface {
 }
 
 type AwsresqConfigAPI struct {
-	awsCfg aws.Config
-	region []string
+	awsCfg    aws.Config
+	region    []string
 	apiClient map[string]awsConfigAPI
 }
 
 func NewAwsresqConfigAPI(awsCfg aws.Config, region []string) *AwsresqConfigAPI {
 	return &AwsresqConfigAPI{
-		awsCfg: awsCfg,
-		region: region,
+		awsCfg:    awsCfg,
+		region:    region,
 		apiClient: make(map[string]awsConfigAPI, len(region)),
 	}
 }
@@ -40,7 +40,7 @@ func (api AwsresqConfigAPI) Validate(resource string) bool {
 
 func (api AwsresqConfigAPI) Query(resource string) (*ResultList, error) {
 	resultList := &ResultList{
-		Service: "config",
+		Service:  "config",
 		Resource: resource,
 	}
 
@@ -74,7 +74,7 @@ func (api AwsresqConfigAPI) Query(resource string) (*ResultList, error) {
 
 func (api AwsresqConfigAPI) queryConfigRule(ctx context.Context, ch chan ResultList, region string) {
 	resultList := ResultList{
-		Service: "config",
+		Service:  "config",
 		Resource: "rule",
 	}
 
