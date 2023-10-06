@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.34.6
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.27.7
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.24.0
+	github.com/aws/aws-sdk-go-v2/service/configservice v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.122.0
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.20.0
 	github.com/aws/aws-sdk-go-v2/service/ecs v1.30.1
@@ -29,7 +30,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.35 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.43 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.1.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/configservice v1.36.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.14 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.36 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.35 // indirect
