@@ -35,6 +35,26 @@ func (m *MockawsCloudformationAPI) EXPECT() *MockawsCloudformationAPIMockRecorde
 	return m.recorder
 }
 
+// DescribeStackSet mocks base method.
+func (m *MockawsCloudformationAPI) DescribeStackSet(ctx context.Context, params *cloudformation.DescribeStackSetInput, optFns ...func(*cloudformation.Options)) (*cloudformation.DescribeStackSetOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "DescribeStackSet", varargs...)
+	ret0, _ := ret[0].(*cloudformation.DescribeStackSetOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DescribeStackSet indicates an expected call of DescribeStackSet.
+func (mr *MockawsCloudformationAPIMockRecorder) DescribeStackSet(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeStackSet", reflect.TypeOf((*MockawsCloudformationAPI)(nil).DescribeStackSet), varargs...)
+}
+
 // DescribeStacks mocks base method.
 func (m *MockawsCloudformationAPI) DescribeStacks(ctx context.Context, params *cloudformation.DescribeStacksInput, optFns ...func(*cloudformation.Options)) (*cloudformation.DescribeStacksOutput, error) {
 	m.ctrl.T.Helper()
@@ -53,4 +73,24 @@ func (mr *MockawsCloudformationAPIMockRecorder) DescribeStacks(ctx, params inter
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, params}, optFns...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeStacks", reflect.TypeOf((*MockawsCloudformationAPI)(nil).DescribeStacks), varargs...)
+}
+
+// ListStackSets mocks base method.
+func (m *MockawsCloudformationAPI) ListStackSets(ctx context.Context, params *cloudformation.ListStackSetsInput, optFns ...func(*cloudformation.Options)) (*cloudformation.ListStackSetsOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListStackSets", varargs...)
+	ret0, _ := ret[0].(*cloudformation.ListStackSetsOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListStackSets indicates an expected call of ListStackSets.
+func (mr *MockawsCloudformationAPIMockRecorder) ListStackSets(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListStackSets", reflect.TypeOf((*MockawsCloudformationAPI)(nil).ListStackSets), varargs...)
 }
