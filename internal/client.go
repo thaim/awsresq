@@ -53,6 +53,8 @@ func NewAwsresqClient(region, service string) (*AwsresqClient, error) {
 		client.api = svc.NewAwsresqLogsAPI(client.awsCfg, client.Region)
 	case "lambda":
 		client.api = svc.NewAwsresqLambdaAPI(client.awsCfg, client.Region)
+	case "route53":
+		client.api = svc.NewAwsresqRoute53API(client.awsCfg, client.Region)
 	case "s3":
 		client.api = svc.NewAwsresqS3API(client.awsCfg, client.Region)
 	default:
