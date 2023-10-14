@@ -14,6 +14,7 @@ import (
 
 type awsIamAPI interface {
 	ListRoles(ctx context.Context, params *iam.ListRolesInput, optFns ...func(*iam.Options)) (*iam.ListRolesOutput, error)
+	ListUsers(ctx context.Context, params *iam.ListUsersInput, optFns ...func(*iam.Options)) (*iam.ListUsersOutput, error)
 }
 
 type AwsresqIamAPI struct {
@@ -33,6 +34,7 @@ func NewAwsresqIamAPI(c aws.Config, region []string) *AwsresqIamAPI {
 func (api AwsresqIamAPI) Validate(resource string) bool {
 	validResource := []string{
 		"role",
+		"user",
 	}
 	return slices.Contains(validResource, resource)
 }
@@ -47,6 +49,10 @@ func (api AwsresqIamAPI) Query(resource string) (*ResultList, error) {
 	switch resource {
 	case "role":
 		apiQuery = api.queryIamRole
+		api.region = []string{"us-east-1"}
+	case "user":
+		apiQuery = api.queryIamUser
+		api.region = []string{"us-east-1"}
 	default:
 		return nil, fmt.Errorf("resource %s is not supported in iam service", resource)
 	}
@@ -93,6 +99,30 @@ func (api AwsresqIamAPI) queryIamRole(ctx context.Context, ch chan ResultList, r
 		// doc, _ := url.PathUnescape(*role.AssumeRolePolicyDocument)
 		// role.AssumeRolePolicyDocument = aws.String(doc)
 		resultList.Results = append(resultList.Results, role)
+	}
+
+	ch <- resultList
+}
+
+func (api AwsresqIamAPI) queryIamUser(ctx context.Context, ch chan ResultList, region string) {
+	resultList := ResultList{
+		Service:  "iam",
+		Resource: "user",
+	}
+
+	if api.apiClient[region] == nil {
+		api.apiClient[region] = iam.NewFromConfig(api.awsCfg, func(o *iam.Options) {
+			o.Region = region
+		})
+	}
+
+	listOutput, err := api.apiClient[region].ListUsers(ctx, nil)
+	if err != nil {
+		log.Error().Err(err).Msgf("failed to list users in region %s", region)
+		return
+	}
+	for _, user := range listOutput.Users {
+		resultList.Results = append(resultList.Results, user)
 	}
 
 	ch <- resultList

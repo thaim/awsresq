@@ -54,3 +54,23 @@ func (mr *MockawsIamAPIMockRecorder) ListRoles(ctx, params interface{}, optFns .
 	varargs := append([]interface{}{ctx, params}, optFns...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRoles", reflect.TypeOf((*MockawsIamAPI)(nil).ListRoles), varargs...)
 }
+
+// ListUsers mocks base method.
+func (m *MockawsIamAPI) ListUsers(ctx context.Context, params *iam.ListUsersInput, optFns ...func(*iam.Options)) (*iam.ListUsersOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListUsers", varargs...)
+	ret0, _ := ret[0].(*iam.ListUsersOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListUsers indicates an expected call of ListUsers.
+func (mr *MockawsIamAPIMockRecorder) ListUsers(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUsers", reflect.TypeOf((*MockawsIamAPI)(nil).ListUsers), varargs...)
+}
