@@ -81,8 +81,8 @@ func TestIamRoleQuery(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			config, _ := config.LoadDefaultConfig(context.TODO())
-			api := NewAwsresqIamAPI(config, []string{"ap-northeast-1"})
-			api.apiClient["ap-northeast-1"] = mc
+			api := NewAwsresqIamAPI(config, []string{"us-east-1"})
+			api.apiClient["us-east-1"] = mc
 
 			actual, err := api.Query("role")
 
