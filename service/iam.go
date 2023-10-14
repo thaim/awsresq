@@ -47,6 +47,7 @@ func (api AwsresqIamAPI) Query(resource string) (*ResultList, error) {
 	switch resource {
 	case "role":
 		apiQuery = api.queryIamRole
+		api.region = []string{"us-east-1"}
 	default:
 		return nil, fmt.Errorf("resource %s is not supported in iam service", resource)
 	}
