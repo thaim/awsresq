@@ -22,9 +22,21 @@ func TestIamValidate(t *testing.T) {
 		expect   bool
 	}{
 		{
+			name:     "valid group resource",
+			api:      AwsresqIamAPI{},
+			resource: "group",
+			expect:   true,
+		},
+		{
 			name:     "valid role resource",
 			api:      AwsresqIamAPI{},
 			resource: "role",
+			expect:   true,
+		},
+		{
+			name:     "valid user resource",
+			api:      AwsresqIamAPI{},
+			resource: "user",
 			expect:   true,
 		},
 		{
