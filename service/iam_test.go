@@ -58,6 +58,82 @@ func TestIamValidate(t *testing.T) {
 	}
 }
 
+func TestIamGroupQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsIamAPI(ctrl)
+
+	mc.EXPECT().
+		ListGroups(gomock.Any(), nil).
+		Return(&iam.ListGroupsOutput{
+			Groups: []types.Group{
+				{
+					GroupName: aws.String("test-group"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		expected  []types.Group
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name: "valid group query",
+			expected: []types.Group{
+				{
+					GroupName: aws.String("test-group"),
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqIamAPI(config, []string{"us-east-1"})
+			api.apiClient["us-east-1"] = mc
+
+			actual, err := api.Query("group")
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error, but got nil")
+				}
+				if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected %v, but got %v", tt.expectErr, err.Error())
+				}
+			}
+			if err != nil {
+				t.Errorf("expected nil, but got %v", err.Error())
+			}
+
+			if actual.Service != "iam" {
+				t.Errorf("expected iam, but got %v", actual.Service)
+			}
+			if actual.Resource != "group" {
+				t.Errorf("expected group, but got %v", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %v, but got %v", len(tt.expected), len(actual.Results))
+			}
+
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.Group)
+				if !ok {
+					t.Errorf("expected types.Group, but got %T", actual.Results[i])
+				}
+				if !reflect.DeepEqual(actualOutput.GroupName, tt.expected[i].GroupName) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].GroupName, actualOutput.GroupName)
+				}
+			}
+		})
+	}
+}
+
 func TestIamRoleQuery(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mc := mock_service.NewMockawsIamAPI(ctrl)
