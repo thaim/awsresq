@@ -35,6 +35,26 @@ func (m *MockawsIamAPI) EXPECT() *MockawsIamAPIMockRecorder {
 	return m.recorder
 }
 
+// ListGroups mocks base method.
+func (m *MockawsIamAPI) ListGroups(ctx context.Context, params *iam.ListGroupsInput, optFns ...func(*iam.Options)) (*iam.ListGroupsOutput, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, params}
+	for _, a := range optFns {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListGroups", varargs...)
+	ret0, _ := ret[0].(*iam.ListGroupsOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListGroups indicates an expected call of ListGroups.
+func (mr *MockawsIamAPIMockRecorder) ListGroups(ctx, params interface{}, optFns ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, params}, optFns...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGroups", reflect.TypeOf((*MockawsIamAPI)(nil).ListGroups), varargs...)
+}
+
 // ListRoles mocks base method.
 func (m *MockawsIamAPI) ListRoles(ctx context.Context, params *iam.ListRolesInput, optFns ...func(*iam.Options)) (*iam.ListRolesOutput, error) {
 	m.ctrl.T.Helper()
