@@ -156,7 +156,7 @@ func TestIamRoleQuery(t *testing.T) {
 		expectErr string
 	}{
 		{
-			name: "valid instance query",
+			name: "valid role query",
 			expected: []types.Role{
 				{
 					RoleName: aws.String("test-role"),
