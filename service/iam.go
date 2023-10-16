@@ -50,12 +50,12 @@ func (api AwsresqIamAPI) Query(resource string) (*ResultList, error) {
 	var apiQuery ResourceQueryAPI
 	api.region = []string{"us-east-1"}
 	switch resource {
+	case "group":
+		apiQuery = api.queryIamGroup
 	case "role":
 		apiQuery = api.queryIamRole
 	case "user":
 		apiQuery = api.queryIamUser
-	case "group":
-		apiQuery = api.queryIamGroup
 	default:
 		return nil, fmt.Errorf("resource %s is not supported in iam service", resource)
 	}
@@ -78,6 +78,30 @@ func (api AwsresqIamAPI) Query(resource string) (*ResultList, error) {
 	}
 
 	return resultList, nil
+}
+
+func (api AwsresqIamAPI) queryIamGroup(ctx context.Context, ch chan ResultList, region string) {
+	resultList := ResultList{
+		Service:  "iam",
+		Resource: "group",
+	}
+
+	if api.apiClient[region] == nil {
+		api.apiClient[region] = iam.NewFromConfig(api.awsCfg, func(o *iam.Options) {
+			o.Region = region
+		})
+	}
+
+	listOutput, err := api.apiClient[region].ListGroups(ctx, nil)
+	if err != nil {
+		log.Error().Err(err).Msgf("failed to list groups in region %s", region)
+		return
+	}
+	for _, group := range listOutput.Groups {
+		resultList.Results = append(resultList.Results, group)
+	}
+
+	ch <- resultList
 }
 
 func (api AwsresqIamAPI) queryIamRole(ctx context.Context, ch chan ResultList, region string) {
@@ -126,30 +150,6 @@ func (api AwsresqIamAPI) queryIamUser(ctx context.Context, ch chan ResultList, r
 	}
 	for _, user := range listOutput.Users {
 		resultList.Results = append(resultList.Results, user)
-	}
-
-	ch <- resultList
-}
-
-func (api AwsresqIamAPI) queryIamGroup(ctx context.Context, ch chan ResultList, region string) {
-	resultList := ResultList{
-		Service:  "iam",
-		Resource: "group",
-	}
-
-	if api.apiClient[region] == nil {
-		api.apiClient[region] = iam.NewFromConfig(api.awsCfg, func(o *iam.Options) {
-			o.Region = region
-		})
-	}
-
-	listOutput, err := api.apiClient[region].ListGroups(ctx, nil)
-	if err != nil {
-		log.Error().Err(err).Msgf("failed to list groups in region %s", region)
-		return
-	}
-	for _, group := range listOutput.Groups {
-		resultList.Results = append(resultList.Results, group)
 	}
 
 	ch <- resultList
