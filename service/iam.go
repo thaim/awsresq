@@ -8,12 +8,14 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	"github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/exp/slices"
 )
 
 type awsIamAPI interface {
 	ListGroups(ctx context.Context, params *iam.ListGroupsInput, optFns ...func(*iam.Options)) (*iam.ListGroupsOutput, error)
+	ListPolicies(ctx context.Context, params *iam.ListPoliciesInput, optFns ...func(*iam.Options)) (*iam.ListPoliciesOutput, error)
 	ListRoles(ctx context.Context, params *iam.ListRolesInput, optFns ...func(*iam.Options)) (*iam.ListRolesOutput, error)
 	ListUsers(ctx context.Context, params *iam.ListUsersInput, optFns ...func(*iam.Options)) (*iam.ListUsersOutput, error)
 }
@@ -35,6 +37,7 @@ func NewAwsresqIamAPI(c aws.Config, region []string) *AwsresqIamAPI {
 func (api AwsresqIamAPI) Validate(resource string) bool {
 	validResource := []string{
 		"group",
+		"policy",
 		"role",
 		"user",
 	}
@@ -52,6 +55,8 @@ func (api AwsresqIamAPI) Query(resource string) (*ResultList, error) {
 	switch resource {
 	case "group":
 		apiQuery = api.queryIamGroup
+	case "policy":
+		apiQuery = api.queryIamPolicy
 	case "role":
 		apiQuery = api.queryIamRole
 	case "user":
@@ -99,6 +104,33 @@ func (api AwsresqIamAPI) queryIamGroup(ctx context.Context, ch chan ResultList, 
 	}
 	for _, group := range listOutput.Groups {
 		resultList.Results = append(resultList.Results, group)
+	}
+
+	ch <- resultList
+}
+
+func (api AwsresqIamAPI) queryIamPolicy(ctx context.Context, ch chan ResultList, region string) {
+	resultList := ResultList{
+		Service:  "iam",
+		Resource: "policy",
+	}
+
+	if api.apiClient[region] == nil {
+		api.apiClient[region] = iam.NewFromConfig(api.awsCfg, func(o *iam.Options) {
+			o.Region = region
+		})
+	}
+
+	listOutput, err := api.apiClient[region].ListPolicies(ctx, &iam.ListPoliciesInput{
+		// ignore AWS managed policies
+		Scope: types.PolicyScopeTypeLocal,
+	})
+	if err != nil {
+		log.Error().Err(err).Msgf("failed to list policies in region %s", region)
+		return
+	}
+	for _, policy := range listOutput.Policies {
+		resultList.Results = append(resultList.Results, policy)
 	}
 
 	ch <- resultList

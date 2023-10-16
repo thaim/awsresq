@@ -134,6 +134,84 @@ func TestIamGroupQuery(t *testing.T) {
 	}
 }
 
+func TestIamPolicyQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsIamAPI(ctrl)
+
+	mc.EXPECT().
+		ListPolicies(gomock.Any(), &iam.ListPoliciesInput{
+			Scope: types.PolicyScopeTypeLocal,
+		}).
+		Return(&iam.ListPoliciesOutput{
+			Policies: []types.Policy{
+				{
+					PolicyName: aws.String("test-policy"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		expected  []types.Policy
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name: "valid policy query",
+			expected: []types.Policy{
+				{
+					PolicyName: aws.String("test-policy"),
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqIamAPI(config, []string{"us-east-1"})
+			api.apiClient["us-east-1"] = mc
+
+			actual, err := api.Query("policy")
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error, but got nil")
+				}
+				if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected %v, but got %v", tt.expectErr, err.Error())
+				}
+			}
+			if err != nil {
+				t.Errorf("expected nil, but got %v", err.Error())
+			}
+
+			if actual.Service != "iam" {
+				t.Errorf("expected iam, but got %v", actual.Service)
+			}
+			if actual.Resource != "policy" {
+				t.Errorf("expected policy, but got %v", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %v, but got %v", len(tt.expected), len(actual.Results))
+			}
+
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.Policy)
+				if !ok {
+					t.Errorf("expected types.Group, but got %T", actual.Results[i])
+				}
+				if !reflect.DeepEqual(actualOutput.PolicyName, tt.expected[i].PolicyName) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].PolicyName, actualOutput.PolicyName)
+				}
+			}
+		})
+	}
+}
+
 func TestIamRoleQuery(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mc := mock_service.NewMockawsIamAPI(ctrl)
