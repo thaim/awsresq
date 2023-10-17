@@ -90,8 +90,8 @@ func TestIamAccessKeysQuery(t *testing.T) {
 			name: "valid access-key query",
 			expected: []types.AccessKeyMetadata{
 				{
-					AccessKeyId:  aws.String("test-access-key"),
-					UserName:     aws.String("test-user"),
+					AccessKeyId: aws.String("test-access-key"),
+					UserName:    aws.String("test-user"),
 				},
 			},
 			wantErr: false,
