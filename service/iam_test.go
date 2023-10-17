@@ -22,6 +22,12 @@ func TestIamValidate(t *testing.T) {
 		expect   bool
 	}{
 		{
+			name:     "valid access-key resource",
+			api:      AwsresqIamAPI{},
+			resource: "access-key",
+			expect:   true,
+		},
+		{
 			name:     "valid group resource",
 			api:      AwsresqIamAPI{},
 			resource: "group",
@@ -53,6 +59,87 @@ func TestIamValidate(t *testing.T) {
 
 			if actual != tt.expect {
 				t.Errorf("expected %t, got %t", tt.expect, actual)
+			}
+		})
+	}
+}
+
+func TestIamAccessKeysQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsIamAPI(ctrl)
+
+	mc.EXPECT().
+		ListAccessKeys(gomock.Any(), nil).
+		Return(&iam.ListAccessKeysOutput{
+			AccessKeyMetadata: []types.AccessKeyMetadata{
+				{
+					AccessKeyId: aws.String("test-access-key"),
+					UserName:    aws.String("test-user"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		expected  []types.AccessKeyMetadata
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name: "valid access-key query",
+			expected: []types.AccessKeyMetadata{
+				{
+					AccessKeyId: aws.String("test-access-key"),
+					UserName:    aws.String("test-user"),
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqIamAPI(config, []string{"us-east-1"})
+			api.apiClient["us-east-1"] = mc
+
+			actual, err := api.Query("access-key")
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error, but got nil")
+				}
+				if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected %v, but got %v", tt.expectErr, err.Error())
+				}
+			}
+			if err != nil {
+				t.Errorf("expected nil, but got %v", err.Error())
+			}
+
+			if actual.Service != "iam" {
+				t.Errorf("expected iam, but got %v", actual.Service)
+			}
+			if actual.Resource != "access-key" {
+				t.Errorf("expected access-key, but got %v", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %v, but got %v", len(tt.expected), len(actual.Results))
+			}
+
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.AccessKeyMetadata)
+				if !ok {
+					t.Errorf("expected types.AccessKeyMetadata, but got %T", actual.Results[i])
+				}
+				if !reflect.DeepEqual(actualOutput.AccessKeyId, tt.expected[i].AccessKeyId) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].AccessKeyId, actualOutput.AccessKeyId)
+				}
+				if !reflect.DeepEqual(actualOutput.UserName, tt.expected[i].UserName) {
+					t.Errorf("expected %v, but got %v", tt.expected[i].UserName, actualOutput.UserName)
+				}
 			}
 		})
 	}

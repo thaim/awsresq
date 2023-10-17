@@ -14,6 +14,7 @@ import (
 )
 
 type awsIamAPI interface {
+	ListAccessKeys(ctx context.Context, params *iam.ListAccessKeysInput, optFns ...func(*iam.Options)) (*iam.ListAccessKeysOutput, error)
 	ListGroups(ctx context.Context, params *iam.ListGroupsInput, optFns ...func(*iam.Options)) (*iam.ListGroupsOutput, error)
 	ListPolicies(ctx context.Context, params *iam.ListPoliciesInput, optFns ...func(*iam.Options)) (*iam.ListPoliciesOutput, error)
 	ListRoles(ctx context.Context, params *iam.ListRolesInput, optFns ...func(*iam.Options)) (*iam.ListRolesOutput, error)
@@ -36,6 +37,7 @@ func NewAwsresqIamAPI(c aws.Config, region []string) *AwsresqIamAPI {
 
 func (api AwsresqIamAPI) Validate(resource string) bool {
 	validResource := []string{
+		"access-key",
 		"group",
 		"policy",
 		"role",
@@ -53,6 +55,8 @@ func (api AwsresqIamAPI) Query(resource string) (*ResultList, error) {
 	var apiQuery ResourceQueryAPI
 	api.region = []string{"us-east-1"}
 	switch resource {
+	case "access-key":
+		apiQuery = api.queryIamAccessKey
 	case "group":
 		apiQuery = api.queryIamGroup
 	case "policy":
@@ -83,6 +87,30 @@ func (api AwsresqIamAPI) Query(resource string) (*ResultList, error) {
 	}
 
 	return resultList, nil
+}
+
+func (api AwsresqIamAPI) queryIamAccessKey(ctx context.Context, ch chan ResultList, region string) {
+	resultList := ResultList{
+		Service:  "iam",
+		Resource: "access-key",
+	}
+
+	if api.apiClient[region] == nil {
+		api.apiClient[region] = iam.NewFromConfig(api.awsCfg, func(o *iam.Options) {
+			o.Region = region
+		})
+	}
+
+	listOutput, err := api.apiClient[region].ListAccessKeys(ctx, nil)
+	if err != nil {
+		log.Error().Err(err).Msgf("failed to list access-keys in region %s", region)
+		return
+	}
+	for _, group := range listOutput.AccessKeyMetadata {
+		resultList.Results = append(resultList.Results, group)
+	}
+
+	ch <- resultList
 }
 
 func (api AwsresqIamAPI) queryIamGroup(ctx context.Context, ch chan ResultList, region string) {
