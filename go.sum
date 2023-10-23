@@ -27,8 +27,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.24.0 h1:6LRil7J+uh2SZ58Wk
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.24.0/go.mod h1:5v2ZNXCSwG73rx0k3sCuB1Ju8sbEbG0iUlxCA7D8sV8=
 github.com/aws/aws-sdk-go-v2/service/configservice v1.37.0 h1:w0i7idA9yDSzoJH+xmzNMVqxgMntwmSmIKOVsZYPY3U=
 github.com/aws/aws-sdk-go-v2/service/configservice v1.37.0/go.mod h1:/sYCs43O4z6BPTHHBW3q0Z0gTlTcSS/lnw9iPeCWT+w=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.122.0 h1:i+YnwvmUy51p+8nwH9eDMzn5GWVLK+Pvva6To8O4AaI=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.122.0/go.mod h1:0FhI2Rzcv5BNM3dNnbcCx2qa2naFZoAidJi11cQgzL0=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.126.0 h1:EGYP4IDYHYe4IcpCUxEAIVKr9nZXvtql4HNhEPK1Y3w=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.126.0/go.mod h1:raUdIDoNuDPn9dMG3cCmIm8RoWOmZUqQPzuw8xpmB8Y=
 github.com/aws/aws-sdk-go-v2/service/ecr v1.20.0 h1:Qw8H7V55d2P1d/a9+cLgAcdez4GtP6l30KQAeYqx9vY=
 github.com/aws/aws-sdk-go-v2/service/ecr v1.20.0/go.mod h1:pGwmNL8hN0jpBfKfTbmu+Rl0bJkDhaGl+9PQLrZ4KLo=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.30.3 h1:kaUxW8ZGd3cZYNfZ4QvCUUu+6GeyznPTk4qCYIjvtRc=
@@ -41,7 +41,6 @@ github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.15 h1:7R8uRYy
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.15/go.mod h1:26SQUPcTNgV1Tapwdt4a1rOsYRsnBsJHLMPoxK2b0d8=
 github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.38 h1:skaFGzv+3kA+v2BPKhuekeb1Hbb105+44r8ASC+q5SE=
 github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.38/go.mod h1:epIZoRSSbRIwLPJU5F+OldHhwZPBdpDeQkRdCeY3+00=
-github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.35/go.mod h1:QGF2Rs33W5MaN9gYdEQOBBFPLwTZkEhRwI33f7KIG0o=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.37 h1:WWZA/I2K4ptBS1kg0kV1JbBtG/umed0vwHRrmcr9z7k=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.37/go.mod h1:vBmDnwWXWxNPFRMmG2m/3MKOe+xEcMDo1tanpaWCcck=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.15.6 h1:9ulSU5ClouoPIYhDQdg9tpl83d5Yb91PXTKK+17q+ow=
