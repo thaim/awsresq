@@ -273,7 +273,7 @@ func TestEcsTaskQuery(t *testing.T) {
 			if actual.Service != "ecs" {
 				t.Errorf("expected service 'ecs', but got '%v'", actual.Service)
 			}
-			if actual.Resource != "task-definition" {
+			if actual.Resource != "task" {
 				t.Errorf("expected resource 'task', but got '%v'", actual.Resource)
 			}
 
@@ -281,9 +281,9 @@ func TestEcsTaskQuery(t *testing.T) {
 				t.Errorf("expected %d results, but got %d", len(tt.expected), len(actual.Results))
 			}
 			for i := range tt.expected {
-				actualOutput, ok := actual.Results[i].(*types.Task)
+				actualOutput, ok := actual.Results[i].(types.Task)
 				if !ok {
-					t.Errorf("expected type *ecs.Task, but got %T", actual.Results[i])
+					t.Errorf("expected type *types.Task, but got %T", actual.Results[i])
 				}
 				if !reflect.DeepEqual(tt.expected[i].TaskArn, actualOutput.TaskArn) {
 					t.Errorf("expected %+v, but got %+v", tt.expected[i].TaskArn, actualOutput.TaskArn)
