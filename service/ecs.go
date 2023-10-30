@@ -20,6 +20,8 @@ type awsEcsAPI interface {
 	DescribeClusters(ctx context.Context, params *ecs.DescribeClustersInput, optFns ...func(*ecs.Options)) (*ecs.DescribeClustersOutput, error)
 	ListServices(ctx context.Context, params *ecs.ListServicesInput, optFns ...func(*ecs.Options)) (*ecs.ListServicesOutput, error)
 	DescribeServices(ctx context.Context, params *ecs.DescribeServicesInput, optFns ...func(*ecs.Options)) (*ecs.DescribeServicesOutput, error)
+	ListTasks(ctx context.Context, params *ecs.ListTasksInput, optFns ...func(*ecs.Options)) (*ecs.ListTasksOutput, error)
+	DescribeTasks(ctx context.Context, params *ecs.DescribeTasksInput, optFns ...func(*ecs.Options)) (*ecs.DescribeTasksOutput, error)
 	ListTaskDefinitions(ctx context.Context, params *ecs.ListTaskDefinitionsInput, optFns ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error)
 	DescribeTaskDefinition(ctx context.Context, params *ecs.DescribeTaskDefinitionInput, optFns ...func(*ecs.Options)) (*ecs.DescribeTaskDefinitionOutput, error)
 }
@@ -42,6 +44,7 @@ func (api AwsresqEcsAPI) Validate(resource string) bool {
 	validResources := []string{
 		"cluster",
 		"service",
+		"task",
 		"task-definition",
 	}
 
@@ -61,6 +64,8 @@ func (api AwsresqEcsAPI) Query(resource string) (*ResultList, error) {
 		apiQuery = api.queryCluster
 	case "service":
 		apiQuery = api.queryService
+	case "task":
+		apiQuery = api.queryTask
 	case "task-definition":
 		apiQuery = api.queryTaskDefinition
 	default:
@@ -208,6 +213,54 @@ func (api *AwsresqEcsAPI) queryService(ctx context.Context, ch chan ResultList, 
 
 			for _, service := range output.Services {
 				resultList.Results = append(resultList.Results, service)
+			}
+		}
+	}
+
+	ch <- resultList
+}
+
+func (api *AwsresqEcsAPI) queryTask(ctx context.Context, ch chan ResultList, r string) {
+	resultList := ResultList{
+		Service:  "ecs",
+		Resource: "task",
+	}
+
+	if api.apiClient[r] == nil {
+		api.apiClient[r] = ecs.NewFromConfig(api.awsCfg, func(o *ecs.Options) {
+			o.Region = r
+		})
+	}
+
+	clusterOutput, err := api.apiClient[r].ListClusters(ctx, nil)
+	if err != nil {
+		log.Error().Msgf("error listing clusters in region %s: %s", r, err)
+		return
+	}
+
+	for _, clusterArn := range clusterOutput.ClusterArns {
+		input := &ecs.ListTasksInput{
+			Cluster: aws.String(clusterArn),
+		}
+		listTask, err := api.apiClient[r].ListTasks(ctx, input)
+		if err != nil {
+			log.Error().Msgf("error listing tasks in region %s: %s", r, err)
+			return
+		}
+
+		for _, arn := range listTask.TaskArns {
+			input := &ecs.DescribeTasksInput{
+				Cluster: aws.String(clusterArn),
+				Tasks:   []string{arn},
+			}
+			output, err := api.apiClient[r].DescribeTasks(ctx, input)
+			if err != nil {
+				log.Error().Msgf("error describing task %s in region %s: %s", arn, r, err)
+				return
+			}
+
+			for _, task := range output.Tasks {
+				resultList.Results = append(resultList.Results, task)
 			}
 		}
 	}

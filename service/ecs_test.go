@@ -22,15 +22,27 @@ func TestEcsValidate(t *testing.T) {
 		expected bool
 	}{
 		{
-			name:     "validate task-definition resource",
+			name:     "validate cluster resource",
 			api:      AwsresqEcsAPI{},
-			resource: "task-definition",
+			resource: "cluster",
 			expected: true,
 		},
 		{
 			name:     "validate service resource",
 			api:      AwsresqEcsAPI{},
 			resource: "service",
+			expected: true,
+		},
+		{
+			name:     "validate task resource",
+			api:      AwsresqEcsAPI{},
+			resource: "task",
+			expected: true,
+		},
+		{
+			name:     "validate task-definition resource",
+			api:      AwsresqEcsAPI{},
+			resource: "task-definition",
 			expected: true,
 		},
 		{
@@ -146,6 +158,135 @@ func TestEcsClusterQuery(t *testing.T) {
 				}
 				if !reflect.DeepEqual(actualOutput.ClusterName, tt.expected[i].ClusterName) {
 					t.Errorf("expected %v, but got %v", tt.expected[i].ClusterName, actualOutput.ClusterName)
+				}
+			}
+		})
+	}
+}
+
+func TestEcsTaskQuery(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mc := mock_service.NewMockawsEcsAPI(ctrl)
+
+	mc.EXPECT().
+		ListClusters(gomock.Any(), nil).
+		Return(&ecs.ListClustersOutput{
+			ClusterArns: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01",
+				"arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02",
+			},
+		}, nil).
+		AnyTimes()
+
+	mc.EXPECT().
+		ListTasks(gomock.Any(), &ecs.ListTasksInput{
+			Cluster: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01"),
+		}).
+		Return(&ecs.ListTasksOutput{
+			TaskArns: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/74de0355a10a4f979ac495c14EXAMPLE",
+				"arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/d789e94343414c25b9f6bd59eEXAMPLE",
+			},
+		}, nil).
+		AnyTimes()
+	mc.EXPECT().
+		ListTasks(gomock.Any(), &ecs.ListTasksInput{
+			Cluster: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02"),
+		}).
+		Return(&ecs.ListTasksOutput{
+			TaskArns: []string{},
+		}, nil).
+		AnyTimes()
+
+	mc.EXPECT().
+		DescribeTasks(gomock.Any(), &ecs.DescribeTasksInput{
+			Cluster: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01"),
+			Tasks: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/74de0355a10a4f979ac495c14EXAMPLE",
+			},
+		}).
+		Return(&ecs.DescribeTasksOutput{
+			Tasks: []types.Task{
+				{
+					TaskArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/74de0355a10a4f979ac495c14EXAMPLE"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+	mc.EXPECT().
+		DescribeTasks(gomock.Any(), &ecs.DescribeTasksInput{
+			Cluster: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster01"),
+			Tasks: []string{
+				"arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/d789e94343414c25b9f6bd59eEXAMPLE",
+			},
+		}).
+		Return(&ecs.DescribeTasksOutput{
+			Tasks: []types.Task{
+				{
+					TaskArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/d789e94343414c25b9f6bd59eEXAMPLE"),
+				},
+			},
+		}, nil).
+		AnyTimes()
+
+	cases := []struct {
+		name      string
+		resource  string
+		expected  []*types.Task
+		wantErr   bool
+		expectErr string
+	}{
+		{
+			name:     "query task resource",
+			resource: "task",
+			expected: []*types.Task{
+				{
+					TaskArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/74de0355a10a4f979ac495c14EXAMPLE"),
+				},
+				{
+					TaskArn: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:task/testcluster01/d789e94343414c25b9f6bd59eEXAMPLE"),
+				},
+			},
+		},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			config, _ := config.LoadDefaultConfig(context.TODO())
+			api := NewAwsresqEcsAPI(config, []string{"ap-northeast-1"})
+			api.apiClient["ap-northeast-1"] = mc
+
+			actual, err := api.Query(tt.resource)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error '%s', but got no error", tt.expectErr)
+				} else if !strings.Contains(err.Error(), tt.expectErr) {
+					t.Errorf("expected error '%s', but got '%s'", tt.expectErr, err.Error())
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+
+			if actual.Service != "ecs" {
+				t.Errorf("expected service 'ecs', but got '%v'", actual.Service)
+			}
+			if actual.Resource != "task" {
+				t.Errorf("expected resource 'task', but got '%v'", actual.Resource)
+			}
+
+			if len(tt.expected) != len(actual.Results) {
+				t.Errorf("expected %d results, but got %d", len(tt.expected), len(actual.Results))
+			}
+			for i := range tt.expected {
+				actualOutput, ok := actual.Results[i].(types.Task)
+				if !ok {
+					t.Errorf("expected type *types.Task, but got %T", actual.Results[i])
+				}
+				if !reflect.DeepEqual(tt.expected[i].TaskArn, actualOutput.TaskArn) {
+					t.Errorf("expected %+v, but got %+v", tt.expected[i].TaskArn, actualOutput.TaskArn)
 				}
 			}
 		})
