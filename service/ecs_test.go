@@ -189,6 +189,14 @@ func TestEcsTaskQuery(t *testing.T) {
 			},
 		}, nil).
 		AnyTimes()
+	mc.EXPECT().
+		ListTasks(gomock.Any(), &ecs.ListTasksInput{
+			Cluster: aws.String("arn:aws:ecs:ap-northeast-1:012345678901:cluster/testcluster02"),
+		}).
+		Return(&ecs.ListTasksOutput{
+			TaskArns: []string{},
+		}, nil).
+		AnyTimes()
 
 	mc.EXPECT().
 		DescribeTasks(gomock.Any(), &ecs.DescribeTasksInput{
