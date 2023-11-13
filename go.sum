@@ -27,8 +27,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.26.0 h1:Vdh1365tJuj64BGW4
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.26.0/go.mod h1:b+BEEfK7ncwheUZ/IhtuH1tcguGPZkI2TbGT2T/sOZ4=
 github.com/aws/aws-sdk-go-v2/service/configservice v1.37.0 h1:w0i7idA9yDSzoJH+xmzNMVqxgMntwmSmIKOVsZYPY3U=
 github.com/aws/aws-sdk-go-v2/service/configservice v1.37.0/go.mod h1:/sYCs43O4z6BPTHHBW3q0Z0gTlTcSS/lnw9iPeCWT+w=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.128.0 h1:JCUTmTs7W1yvUCOdONMX7Hjgn7N9pj57y4/ibU4KFp4=
-github.com/aws/aws-sdk-go-v2/service/ec2 v1.128.0/go.mod h1:raUdIDoNuDPn9dMG3cCmIm8RoWOmZUqQPzuw8xpmB8Y=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.132.0 h1:JCujezP7Ia2pN6a9WDaT6pS7w1c/uJvuztxdbzc3Fks=
+github.com/aws/aws-sdk-go-v2/service/ec2 v1.132.0/go.mod h1:NOPsghjhZRkrVvKIxrDrEL7zhVIFYJsHqdeol50Eodk=
 github.com/aws/aws-sdk-go-v2/service/ecr v1.22.1 h1:ekQH3O3gUYin2nZ2t0oI0E7FJbnb5WxoyfD6G3YFO1Q=
 github.com/aws/aws-sdk-go-v2/service/ecr v1.22.1/go.mod h1:EJ/S70FD7FPFMbEK/YXW8bXzdk3i8+i9WTNsRxNm+xI=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.30.4 h1:j0VhL2v86gbsOKLQ1EDMhS2Lb0TROVIep7eFobc2Qq0=
@@ -41,7 +41,6 @@ github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.0 h1:CJxo7ZB
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.0/go.mod h1:yjVfjuY4nD1EW9i387Kau+I6V5cBA5YnC/mWNopjZrI=
 github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.2.2 h1:f2LhPofnjcdOQKRtumKjMvIHkfSQ8aH/rwKUDEQ/SB4=
 github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.2.2/go.mod h1:q+xX0H4OfuWDuBy7y/LDi4v8IBOWuF+vtp8Z6ex+lw4=
-github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.37/go.mod h1:vBmDnwWXWxNPFRMmG2m/3MKOe+xEcMDo1tanpaWCcck=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.2 h1:h7j73yuAVVjic8pqswh+L/7r2IHP43QwRyOu6zcCDDE=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.2/go.mod h1:H07AHdK5LSy8F7EJUQhoxyiCNkePoHj2D8P2yGTWafo=
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.16.2 h1:gbIaOzpXixUpoPK+js/bCBK1QBDXM22SigsnzGZio0U=
