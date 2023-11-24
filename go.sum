@@ -23,8 +23,8 @@ github.com/aws/aws-sdk-go-v2/service/cloudformation v1.39.0 h1:Inl237UhHY2vGmRUB
 github.com/aws/aws-sdk-go-v2/service/cloudformation v1.39.0/go.mod h1:31JYEhx6zQd8DUT6Bq0h292pEs+qJIl4fFxoLpVr7jY=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.30.1 h1:6Bkn/mpcNLl9Ux9q4JNUIAHmaPiQ9OfnYNfzUeAoQxo=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.30.1/go.mod h1:qGqsvz4AZhM2l4G8HjSsOoy1/pjDJvMGDSWOUn4cJbM=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.26.0 h1:Vdh1365tJuj64BGW4+o04F2URR5JkH3MyRyOkMGH/F0=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.26.0/go.mod h1:b+BEEfK7ncwheUZ/IhtuH1tcguGPZkI2TbGT2T/sOZ4=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.27.1 h1:TNRPtVMfBVk24DL3on3aCSVaEbkLJkVewen+ag01Y5E=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.27.1/go.mod h1:f+2AxSfO44KOyp+hsuDsjJyZmaOQxkcmGKRFExyHZdU=
 github.com/aws/aws-sdk-go-v2/service/configservice v1.37.0 h1:w0i7idA9yDSzoJH+xmzNMVqxgMntwmSmIKOVsZYPY3U=
 github.com/aws/aws-sdk-go-v2/service/configservice v1.37.0/go.mod h1:/sYCs43O4z6BPTHHBW3q0Z0gTlTcSS/lnw9iPeCWT+w=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.135.0 h1:gX7PiK9aGDmDE/LcF+RCJYN1jlPkL21ZuBJFlVAkNtM=
