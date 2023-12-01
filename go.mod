@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/aws/aws-sdk-go-v2 v1.23.1
 	github.com/aws/aws-sdk-go-v2/config v1.25.5
-	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.39.0
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.40.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.30.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.27.1
 	github.com/aws/aws-sdk-go-v2/service/configservice v1.37.0
