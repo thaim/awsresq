@@ -3,7 +3,7 @@ module github.com/thaim/awsresq
 go 1.20
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.23.4
+	github.com/aws/aws-sdk-go-v2 v1.23.5
 	github.com/aws/aws-sdk-go-v2/config v1.25.5
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.40.1
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.30.1
