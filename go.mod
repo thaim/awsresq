@@ -16,7 +16,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/iam v1.28.2
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.43.0
 	github.com/aws/aws-sdk-go-v2/service/route53 v1.35.4
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.47.4
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.47.5
 	github.com/golang/mock v1.6.0
 	github.com/rs/zerolog v1.31.0
 	github.com/urfave/cli/v2 v2.26.0
