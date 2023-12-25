@@ -15,7 +15,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/efs v1.23.3
 	github.com/aws/aws-sdk-go-v2/service/iam v1.28.5
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.49.6
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.35.4
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.36.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.47.7
 	github.com/golang/mock v1.6.0
 	github.com/rs/zerolog v1.31.0
